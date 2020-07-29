@@ -12,7 +12,7 @@ with SMBus(3) as bus:
 
     sensor, serial_number, _, _ = read_product_info(bus)
     scale_factor, units, _, _ = read_scale_and_unit(bus)
-    set_read_data()
+    set_read_data(bus)
     while True:
         raw_flow_reading, _, crc_result = read_raw_data(bus, True)
         scaled_flow_reading = scale_reading(raw_flow_reading, scale_factor)
