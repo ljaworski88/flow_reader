@@ -33,11 +33,12 @@ with SMBus(3) as bus:
         print('The current flow rate is: {} {}'.format(scaled_flow_reading, units))
         if 3100 < scaled_flow_reading < 3500:
             timeout_buffer.append((time(), scaled_flow_reading))
-            beggining_average = mean(list(timeout_buffer)[:100])
-            ending_average = mean(list(timeout_buffer)[-100:])
-            if abs(beggining_average-ending_average) < 100 and len(timeout_buffer) > 2500:
-                print('ALL DONE!!')
-            else:
-                print('Approaching the end')
+            if len(timeout_buffer) > 2500:
+                beggining_average = mean(list(timeout_buffer)[:100])
+                ending_average = mean(list(timeout_buffer)[-100:])
+                if abs(beggining_average-ending_average) < 100:
+                    print('ALL DONE!!')
+                else:
+                    print('Approaching the end')
         sleep(0.25)
         system('clear')
