@@ -6,128 +6,136 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>605</width>
-    <height>876</height>
+    <width>755</width>
+    <height>671</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_5">
-    <item row="0" column="0">
-     <widget class="QTabWidget" name="mainTabStack">
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <widget class="QWidget" name="graphicsTab">
-       <property name="toolTip">
-        <string>Main Window with Live Graphs</string>
-       </property>
-       <property name="toolTipDuration">
-        <number>5</number>
-       </property>
-       <attribute name="title">
-        <string>Graph</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+   <widget class="QTabWidget" name="mainTabStack">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>471</width>
+      <height>604</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>2</number>
+    </property>
+    <widget class="QWidget" name="graphicsTab">
+     <property name="toolTip">
+      <string>Main Window with Live Graphs</string>
+     </property>
+     <property name="toolTipDuration">
+      <number>5</number>
+     </property>
+     <attribute name="title">
+      <string>Graph</string>
+     </attribute>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QVBoxLayout" name="graphTabVerticalLayout">
         <item>
-         <layout class="QVBoxLayout" name="graphTabVerticalLayout">
+         <widget class="QTabWidget" name="graphsTab">
+          <property name="currentIndex">
+           <number>2</number>
+          </property>
+          <widget class="QWidget" name="flowGraphTab">
+           <attribute name="title">
+            <string>Flow</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="GraphicsLayoutWidget" name="flowGraph"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="pressureGraphTab">
+           <attribute name="title">
+            <string>Pressure</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="GraphicsLayoutWidget" name="pressureGraph"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="currentGraphTab">
+           <attribute name="title">
+            <string>Current</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <widget class="GraphicsLayoutWidget" name="currentGraph"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="voltageGraphTab">
+           <attribute name="title">
+            <string>Voltage</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="GraphicsLayoutWidget" name="voltageGraph"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="loggingLayout">
           <item>
-           <widget class="QTabWidget" name="graphsTab">
-            <property name="currentIndex">
-             <number>0</number>
-            </property>
-            <widget class="QWidget" name="flowGraphTab">
-             <attribute name="title">
-              <string>Flow</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_4">
-              <item row="0" column="0">
-               <widget class="GraphicsLayoutWidget" name="flowGraph"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="pressureGraphTab">
-             <attribute name="title">
-              <string>Pressure</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="GraphicsLayoutWidget" name="pressureGraph"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="currentGraphTab">
-             <attribute name="title">
-              <string>Current</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="0">
-               <widget class="GraphicsLayoutWidget" name="currentGraph"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="voltageGraphTab">
-             <attribute name="title">
-              <string>Voltage</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="GraphicsLayoutWidget" name="voltageGraph"/>
-              </item>
-             </layout>
-            </widget>
-           </widget>
+           <widget class="QLineEdit" name="logFileLineEdit"/>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="loggingLayout">
+           <widget class="QPushButton" name="logButton">
+            <property name="text">
+             <string>Log</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="infoTickerHorizontalLayout">
+          <item>
+           <layout class="QVBoxLayout" name="descriptionsLayout">
             <item>
-             <widget class="QLineEdit" name="saveFileLine"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="logButton">
+             <widget class="QLabel" name="sensorInfo">
               <property name="text">
-               <string>Log</string>
+               <string>sensorInfo</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="infoTickerLayout">
+           <layout class="QVBoxLayout" name="unitsLayout">
             <item>
-             <layout class="QVBoxLayout" name="descriptionsLayout">
-              <item>
-               <widget class="QLabel" name="graphLabel">
-                <property name="text">
-                 <string>graphLabel</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="sensorInfo">
-                <property name="text">
-                 <string>sensorInfo</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLCDNumber" name="currentReadingLCD"/>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="unitsLayout">
-              <item>
-               <widget class="QLCDNumber" name="currentReadingLCD"/>
-              </item>
-              <item>
-               <widget class="QComboBox" name="unitsComboBox"/>
-              </item>
-             </layout>
+             <widget class="QComboBox" name="unitsComboBox"/>
             </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="runCalculateVerticalLayout">
             <item>
-             <widget class="QPushButton" name="runButton">
+             <widget class="QPushButton" name="runStopButton">
               <property name="text">
                <string>Run</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="calculateResultButton">
+              <property name="text">
+               <string>Calculate Result</string>
               </property>
              </widget>
             </item>
@@ -136,228 +144,208 @@
          </layout>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="sensorSettingsTab">
-       <attribute name="title">
-        <string>Sensor Settings</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="sensorSettingsTab">
+     <attribute name="title">
+      <string>Sensor Settings</string>
+     </attribute>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QVBoxLayout" name="sensorSettingsVerticalLayout">
         <item>
-         <layout class="QVBoxLayout" name="sensorSettingsVerticalLayout">
+         <layout class="QHBoxLayout" name="loadSettingsHorizontalLayout">
           <item>
-           <layout class="QHBoxLayout" name="loadSettingsHorizontalLayout">
-            <item>
-             <widget class="QLineEdit" name="loadFlowReaderSettingsLineEdit"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="loadFlowReaderSettingsButton">
-              <property name="text">
-               <string>Load Settings</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLineEdit" name="loadFlowReaderSettingsLineEdit"/>
           </item>
           <item>
-           <widget class="Line" name="sensorSettingsLine">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="flowMeterSettingLabel">
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(0, 0, 0);
-color: rgb(238, 238, 236);</string>
-            </property>
+           <widget class="QPushButton" name="loadFlowReaderSettingsButton">
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Flow Meter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <string>Load Settings</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <layout class="QFormLayout" name="flowMeterSettingsFormLayout">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="flowUnitSettingComboBox"/>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="flowUnitSettingLabel">
-              <property name="text">
-               <string>Flow Units</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QHBoxLayout" name="resolutionSettingHorizontalLayout">
-              <item>
-               <widget class="QSpinBox" name="resolutionSettingSpinBox">
-                <property name="minimum">
-                 <number>9</number>
-                </property>
-                <property name="maximum">
-                 <number>16</number>
-                </property>
-                <property name="value">
-                 <number>16</number>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="resolutionSettingLabel">
-                <property name="text">
-                 <string>bits</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="flowMeterResolutionSettingLabel">
-              <property name="text">
-               <string>Resolution</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QSpinBox" name="calibartionFieldSpinBox">
-              <property name="maximum">
-               <number>4</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="calibrationFieldSettingLabel">
-              <property name="text">
-               <string>Calibration Field</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QLabel" name="pressureTransducerSettingsLabel">
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(0, 0, 0);
-color: rgb(238, 238, 236);</string>
-            </property>
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pressure Transducer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QFormLayout" name="pressureTransducerSettingsFormLayout">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="pressureUnitSettingComboBox">
-              <property name="toolTip">
-               <string>What units should pressure be reported in.</string>
-              </property>
-              <property name="toolTipDuration">
-               <number>5</number>
-              </property>
-              <property name="currentText">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="pressureUnitSettingLabel">
-              <property name="text">
-               <string>Pressure Units</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QHBoxLayout" name="transducerHighSideButtonHorizontalLayout">
-              <item>
-               <widget class="QRadioButton" name="leftTransducerRadioButton">
-                <property name="toolTip">
-                 <string>The LEFT transducer is connected to the high pressure side.</string>
-                </property>
-                <property name="toolTipDuration">
-                 <number>5</number>
-                </property>
-                <property name="text">
-                 <string>Left</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="rightTransducerRadioButton">
-                <property name="toolTip">
-                 <string>The RIGHT transducer is connected to the high pressure side.</string>
-                </property>
-                <property name="toolTipDuration">
-                 <number>5</number>
-                </property>
-                <property name="text">
-                 <string>Right</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="highPressureSideSelectionLabel">
-              <property name="layoutDirection">
-               <enum>Qt::RightToLeft</enum>
-              </property>
-              <property name="text">
-               <string>High Pressure Side</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QTabWidget" name="transducerSettingsTab">
-          <property name="currentIndex">
-           <number>1</number>
+         <widget class="Line" name="sensorSettingsLine">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <widget class="QWidget" name="leftTransducerSettingsTab">
-           <attribute name="title">
-            <string>Left Transducer</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout">
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="flowMeterSettingLabel">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(238, 238, 236);</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Flow Meter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="flowMeterSettingsFormLayout">
+          <item row="0" column="0">
+           <widget class="QComboBox" name="flowUnitSettingComboBox"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="flowUnitSettingLabel">
+            <property name="text">
+             <string>Flow Units</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="resolutionSettingHorizontalLayout">
             <item>
-             <layout class="QVBoxLayout" name="leftTransducerSettingsVeritcalLayout">
+             <widget class="QSpinBox" name="resolutionSettingSpinBox">
+              <property name="minimum">
+               <number>9</number>
+              </property>
+              <property name="maximum">
+               <number>16</number>
+              </property>
+              <property name="value">
+               <number>16</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="resolutionSettingLabel">
+              <property name="text">
+               <string>bits</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="flowMeterResolutionSettingLabel">
+            <property name="text">
+             <string>Resolution</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="pressureTransducerSettingsLabel">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(238, 238, 236);</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pressure Transducer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="pressureTransducerSettingsFormLayout">
+          <item row="0" column="0">
+           <widget class="QComboBox" name="pressureUnitSettingComboBox">
+            <property name="toolTip">
+             <string>What units should pressure be reported in.</string>
+            </property>
+            <property name="toolTipDuration">
+             <number>5</number>
+            </property>
+            <property name="currentText">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="pressureUnitSettingLabel">
+            <property name="text">
+             <string>Pressure Units</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="transducerHighSideButtonHorizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="leftTransducerRadioButton">
+              <property name="toolTip">
+               <string>The LEFT transducer is connected to the high pressure side.</string>
+              </property>
+              <property name="toolTipDuration">
+               <number>5</number>
+              </property>
+              <property name="text">
+               <string>Left</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="rightTransducerRadioButton">
+              <property name="toolTip">
+               <string>The RIGHT transducer is connected to the high pressure side.</string>
+              </property>
+              <property name="toolTipDuration">
+               <number>5</number>
+              </property>
+              <property name="text">
+               <string>Right</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="highPressureSideSelectionLabel">
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>High Pressure Side</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="transducerSettingsTab">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="leftTransducerSettingsTab">
+         <attribute name="title">
+          <string>Left Transducer</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <layout class="QVBoxLayout" name="leftTransducerSettingsVeritcalLayout">
+            <item>
+             <layout class="QHBoxLayout" name="leftTransducerCalibrationHorizontalLayout">
               <item>
-               <layout class="QFormLayout" name="leftTransducerSettingsLayout">
-                <item row="0" column="1">
-                 <widget class="QLabel" name="leftTransducerSerialLabel">
-                  <property name="text">
-                   <string>Serial Number</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
+               <layout class="QFormLayout" name="leftTransducerCalibrationFormLayout">
+                <item row="0" column="0">
                  <widget class="QLineEdit" name="leftTransducerSlopeLineEdit">
                   <property name="toolTip">
                    <string>Slope of left transducer in [pressure units]/mV</string>
@@ -367,27 +355,31 @@ color: rgb(238, 238, 236);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1">
+                <item row="0" column="1">
                  <widget class="QLabel" name="leftTransducerSlopeLabel">
                   <property name="text">
                    <string>Slope</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
+                <item row="1" column="0">
                  <widget class="QLineEdit" name="leftTransducerInterceptLineEdit">
                   <property name="toolTip">
                    <string>Intercept of left transducer in mV</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="1">
+                <item row="1" column="1">
                  <widget class="QLabel" name="leftTransducerInerceptLabel">
                   <property name="text">
                    <string>Intercept</string>
                   </property>
                  </widget>
                 </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QFormLayout" name="leftTransducerIDFormLayout">
                 <item row="0" column="0">
                  <widget class="QLineEdit" name="leftTransducerSerialLineEdit">
                   <property name="toolTip">
@@ -398,43 +390,50 @@ color: rgb(238, 238, 236);</string>
                   </property>
                  </widget>
                 </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="Line" name="leftTransducerSettingsLine">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="loadLeftTransducerSettingsButton">
-                <property name="text">
-                 <string>Load Cal File</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="rightTransducerSettingsTab">
-           <attribute name="title">
-            <string>Right Transducer</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <layout class="QVBoxLayout" name="rightTransducerSettingsVerticalLayout">
-              <item>
-               <layout class="QFormLayout" name="rightTransducerSettingsLayout">
                 <item row="0" column="1">
-                 <widget class="QLabel" name="rightTransducerSerialLabel">
+                 <widget class="QLabel" name="leftTransducerSerialLabel">
                   <property name="text">
                    <string>Serial Number</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
+                 <widget class="QLineEdit" name="leftTransducerTypeLineEdit"/>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLabel" name="leftTransducerTypeLabel">
+                  <property name="text">
+                   <string>Transducer Type</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="loadLeftTransducerSettingsButton">
+              <property name="text">
+               <string>Load Cal File</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="rightTransducerSettingsTab">
+         <attribute name="title">
+          <string>Right Transducer</string>
+         </attribute>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QVBoxLayout" name="rightTransducerSettingsVerticalLayout">
+            <item>
+             <layout class="QHBoxLayout" name="rightTransducerCalibrationHorizontalLayout">
+              <item>
+               <layout class="QFormLayout" name="rightTransducerCalibrationFormLayout">
+                <item row="0" column="0">
                  <widget class="QLineEdit" name="rightTransducerSlopeLineEdit">
                   <property name="toolTip">
                    <string>Slope of left transducer in [pressure units]/mV</string>
@@ -444,27 +443,31 @@ color: rgb(238, 238, 236);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1">
+                <item row="0" column="1">
                  <widget class="QLabel" name="rightTransducerSlopeLabel">
                   <property name="text">
                    <string>Slope</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
+                <item row="1" column="0">
                  <widget class="QLineEdit" name="rightTransducerInterceptLineEdit">
                   <property name="toolTip">
                    <string>Intercept of left transducer in mV</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="1">
+                <item row="1" column="1">
                  <widget class="QLabel" name="rightTransducerInerceptLabel">
                   <property name="text">
                    <string>Intercept</string>
                   </property>
                  </widget>
                 </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QFormLayout" name="rightTransducerIDFormLayout">
                 <item row="0" column="0">
                  <widget class="QLineEdit" name="rightTransducerSerialLineEdit">
                   <property name="toolTip">
@@ -475,46 +478,256 @@ color: rgb(238, 238, 236);</string>
                   </property>
                  </widget>
                 </item>
+                <item row="0" column="1">
+                 <widget class="QLabel" name="rightTransducerSerialLabel">
+                  <property name="text">
+                   <string>Serial Number</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLineEdit" name="rightTransducerTypeLineEdit"/>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLabel" name="rightTransducerTypeLabel">
+                  <property name="text">
+                   <string>Transducer Type</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
-              </item>
-              <item>
-               <widget class="Line" name="rightTransducerSettingsLine">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="loadRightTransducerSettingsButton">
-                <property name="text">
-                 <string>Load Cal File</string>
-                </property>
-               </widget>
               </item>
              </layout>
             </item>
+            <item>
+             <widget class="QPushButton" name="loadRightTransducerSettingsButton">
+              <property name="text">
+               <string>Load Cal File</string>
+              </property>
+             </widget>
+            </item>
            </layout>
-          </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveSensorSettingsButton">
+        <property name="text">
+         <string>Save Settings</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="experimentSettingsTab">
+     <attribute name="title">
+      <string>Experiment Settings</string>
+     </attribute>
+     <layout class="QVBoxLayout" name="verticalLayout_12">
+      <item>
+       <layout class="QVBoxLayout" name="experimentsSettingsVerticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="loadExperimentSettingsHorizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="loadExperimentSettingsLineEdit"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadExperimentSettingsButton">
+            <property name="text">
+             <string>Load Settings</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="saveResultsHorizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="saveResultsNameLineEdit">
+            <property name="toolTip">
+             <string>The filename for the results</string>
+            </property>
+            <property name="toolTipDuration">
+             <number>3</number>
+            </property>
+            <property name="text">
+             <string>result.csv</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="saveLocationPushButton">
+            <property name="text">
+             <string>Save Results Location</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="experimentSettingsFormLayout">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="crossSectionVerticalLayout">
+            <item>
+             <widget class="QLineEdit" name="crossSectionLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="crossSectionUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="crossSectionLabel">
+            <property name="text">
+             <string>Cross-Sectional Area</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <layout class="QVBoxLayout" name="tissueThicknessVerticalLayout">
+            <item>
+             <widget class="QLineEdit" name="tissueThicknessLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="tissueThicknessUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="tissueThicknessLabel">
+            <property name="text">
+             <string>Tissue Thickness</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <layout class="QVBoxLayout" name="flowSetpointVerticalLayout">
+            <item>
+             <widget class="QLineEdit" name="flowSetpointLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="flowSetpointUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="flowSetpointLabel">
+            <property name="text">
+             <string>Flow Rate Setpoint</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QSpinBox" name="averagingDepthSpinBox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <layout class="QVBoxLayout" name="averagingVerticalLayout">
+            <item>
+             <widget class="QLabel" name="flowRateLabel">
+              <property name="text">
+               <string>Flow Rate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="averagingDepthLabel">
+              <property name="text">
+               <string>Averaging Depth</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="0">
+           <layout class="QVBoxLayout" name="errorBoundsVerticalLayout">
+            <item>
+             <widget class="QLineEdit" name="errorBoundsLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="errorBoundsUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="errorBoundsLabel">
+            <property name="text">
+             <string>Setpoint Error Bounds</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <layout class="QVBoxLayout" name="lockTimeVerticalLayout">
+            <item>
+             <widget class="QLineEdit" name="lockTimeLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="lockTimeUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="lockTimeLabel">
+            <property name="text">
+             <string>Lock In Time</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="finishedOptionVerticalLayout">
+          <item>
+           <widget class="QCheckBox" name="soundDoneCheckBox">
+            <property name="text">
+             <string>Play Sound When Done</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="ledDoneCheckBox">
+            <property name="text">
+             <string>Turn On LED When Done</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="popUpDoneCheckBox">
+            <property name="text">
+             <string>Pop-Up with Results When Done</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="saveExperimentSettingsButton">
+          <property name="text">
+           <string>Save Settings</string>
+          </property>
          </widget>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="experimentSettingsTab">
-       <attribute name="title">
-        <string>Experiment Settings</string>
-       </attribute>
-      </widget>
-     </widget>
-    </item>
-   </layout>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>605</width>
-     <height>22</height>
+     <width>755</width>
+     <height>28</height>
     </rect>
    </property>
   </widget>
