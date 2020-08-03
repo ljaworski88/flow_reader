@@ -76,7 +76,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         self.runStopButton.clicked.connect(self.RunStopData)
         self.currentlyRunning = False
-        self.flowData = deque([], int(self.lockTime*1000/self.timerInterval)) # store 30 min of data
+        self.flowData = deque([], int(self.lockTime*1000/self.timerInterval))
 
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.unitsComboBox.currentText()))
         self.flowGraph.getAxis('bottom').setLabel('Time (sec)')
@@ -84,7 +84,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.flowGraph.showGrid(x=True, y=True)
         self.flowCurve = self.flowGraph.plot()
 
-        if path.isfile(self.lastSettings):
+        if path.isfile(self.globalSettings):
             self.LoadGlobalSettings(self.globalSettings)
 
     def LoadGlobalSettings(self, globalSettings):
