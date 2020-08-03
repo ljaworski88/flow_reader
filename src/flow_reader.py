@@ -101,8 +101,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.currentlyRunning = False
             self.dataTimer.stop()
             self.runStopButton.setText('Run')
-            self.timeData = deque([], int(30 * 60 * 1000 / self.timerInterval)) # store 30 min of data
-            self.flowData = deque([], int(30 * 60 * 1000 / self.timerInterval)) # store 30 min of data
+            self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store 30 min of data
+            self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store 30 min of data
             self.sensorInfo.setText('Stopped')
         else:
             self.dataTimer.start(self.timerInterval)
