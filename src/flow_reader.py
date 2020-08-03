@@ -55,7 +55,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
         self.timerInterval = 250
-        self.lockTime = 1 * 60 # 5min * 60 sec
+        self.lockTime = 10 * 60 # 5min * 60 sec
         self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
         self.unitsComboBox.addItems(self.flowRates)
         self.unitsComboBox.setCurrentText('nL/min')
@@ -70,13 +70,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeUnitsComboBox.addItems(['sec', 'min', 'hr'])
         self.lockTimeUnitsComboBox.setCurrentText('min')
         self.lockTimeUnitsComboBox.currentIndexChanged.connect(self.UpdateLockTime)
-        self.lockTimeLineEdit.setText('1')
+        self.lockTimeLineEdit.setText('10')
         self.lockTimeLineEdit.editingFinished.connect(self.UpdateLockTime)
         self.currentReadingLCD.setSmallDecimalPoint(True)
 
         self.runStopButton.clicked.connect(self.RunStopData)
         self.currentlyRunning = False
-        self.flowData = deque([], int(self.lockTime*1000/self.timerInterval))
+        self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
 
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.unitsComboBox.currentText()))
         self.flowGraph.getAxis('bottom').setLabel('Time (sec)')
@@ -126,7 +126,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         lowerBound = float(self.flowSetpointLineEdit.text()) - float(self.errorBoundsLineEdit.text())
         upperBound = float(self.flowSetpointLineEdit.text()) + float(self.errorBoundsLineEdit.text())
         if lowerBound < self.flowData[-1] < upperBound and len(self.flowData) == self.flowData.maxlen:
-            if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < 50:
+            if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < 25:
                 if self.popUpDoneCheckBox.isChecked():
                     self.msg = QMessageBox()
                     self.msg.setWindowTitle('Experiment Progress')
@@ -134,11 +134,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.setIcon(QMessageBox.Information)
                     self.msg.setStandardButtons(QMessageBox.Ok)
                     self.msg.show()
-                print('All Done')
                 self.RunStopData()
                 return
-            else:
-                print('Not Yet')
 
         self.UpdateGraphs()
 
@@ -167,7 +164,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         pass
 
     def UpdateLockTime(self):
-        if self.timeUnitsDict[self.lockTimeUnitsComboBox.currentText()] * int(self.lockTimeLineEdit.text()) < 1 * 60: # don't allow a lock time shorter than 5 minutes
+        if self.timeUnitsDict[self.lockTimeUnitsComboBox.currentText()] * int(self.lockTimeLineEdit.text()) < 5 * 60: # don't allow a lock time shorter than 5 minutes
             if self.lockTimeUnitsComboBox.currentText() == 'min':
                 self.lockTimeLineEdit.setText('5')
             else:
