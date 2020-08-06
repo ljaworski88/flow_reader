@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from sf04 import *
+from sf04_sensor.sf04 import *
 import playsound
 from time import sleep, time
 from collections import deque
