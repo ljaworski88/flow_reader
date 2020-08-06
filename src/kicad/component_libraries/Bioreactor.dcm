@@ -1,0 +1,8 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP TLP2745
+D Generic Optocoupler with Base Connected
+K NPN DC Optocoupler Base Connected
+$ENDCMP
+#
+#End Doc Library

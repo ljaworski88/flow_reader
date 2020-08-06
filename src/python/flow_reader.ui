@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -152,20 +152,6 @@
         <item>
          <layout class="QVBoxLayout" name="sensorSettingsVerticalLayout">
           <item>
-           <layout class="QHBoxLayout" name="loadSettingsHorizontalLayout">
-            <item>
-             <widget class="QLineEdit" name="loadFlowReaderSettingsLineEdit"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="loadFlowReaderSettingsButton">
-              <property name="text">
-               <string>Load Settings</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
            <widget class="Line" name="sensorSettingsLine">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -296,7 +282,7 @@ color: rgb(238, 238, 236);</string>
         <item>
          <widget class="QTabWidget" name="transducerSettingsTab">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="leftTransducerSettingsTab">
            <attribute name="title">
@@ -500,6 +486,20 @@ color: rgb(238, 238, 236);</string>
          </widget>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="loadSettingsHorizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="loadFlowReaderSettingsLineEdit"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadFlowReaderSettingsButton">
+            <property name="text">
+             <string>Load Settings</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QPushButton" name="saveSensorSettingsButton">
           <property name="text">
            <string>Save Settings</string>
@@ -515,20 +515,6 @@ color: rgb(238, 238, 236);</string>
        <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
          <layout class="QVBoxLayout" name="experimentsSettingsVerticalLayout">
-          <item>
-           <layout class="QHBoxLayout" name="loadExperimentSettingsHorizontalLayout">
-            <item>
-             <widget class="QLineEdit" name="loadExperimentSettingsLineEdit"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="loadExperimentSettingsButton">
-              <property name="text">
-               <string>Load Settings</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
           <item>
            <layout class="QHBoxLayout" name="saveResultsHorizontalLayout">
             <item>
@@ -571,16 +557,6 @@ color: rgb(238, 238, 236);</string>
                <string>Cross-Sectional Area</string>
               </property>
              </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QVBoxLayout" name="tissueThicknessVerticalLayout">
-              <item>
-               <widget class="QLineEdit" name="tissueThicknessLineEdit"/>
-              </item>
-              <item>
-               <widget class="QComboBox" name="tissueThicknessUnitsComboBox"/>
-              </item>
-             </layout>
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="tissueThicknessLabel">
@@ -668,6 +644,16 @@ color: rgb(238, 238, 236);</string>
               </property>
              </widget>
             </item>
+            <item row="1" column="0">
+             <layout class="QVBoxLayout" name="tissueThicknessVerticalLayout">
+              <item>
+               <widget class="QLineEdit" name="tissueThicknessLineEdit"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="tissueThicknessUnitsComboBox"/>
+              </item>
+             </layout>
+            </item>
            </layout>
           </item>
           <item>
@@ -693,6 +679,20 @@ color: rgb(238, 238, 236);</string>
               </property>
               <property name="checked">
                <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="loadExperimentSettingsHorizontalLayout">
+            <item>
+             <widget class="QLineEdit" name="loadExperimentSettingsLineEdit"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="loadExperimentSettingsButton">
+              <property name="text">
+               <string>Load Settings</string>
               </property>
              </widget>
             </item>

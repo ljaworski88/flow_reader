@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from sf04 import *
+import playsound
 from time import sleep, time
 from collections import deque
 from statistics import mean
@@ -39,6 +40,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                                   'torr' : 133.322}
         self.flowRates = [''.join([volumeUnit, '/', timeUnit]) for volumeUnit in self.volumeUnitsDict.keys() for timeUnit in self.timeUnitsDict.keys()]
 
+        self.doneSound = playsound.input('done.wav')
+
         # Set input validators
         self.flowSetpointLineEdit.setValidator(QDoubleValidator())
         self.errorBoundsLineEdit.setValidator(QDoubleValidator())
@@ -72,6 +75,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeUnitsComboBox.currentIndexChanged.connect(self.UpdateLockTime)
         self.lockTimeLineEdit.setText('10')
         self.lockTimeLineEdit.editingFinished.connect(self.UpdateLockTime)
+        self.lockTimeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
         self.currentReadingLCD.setSmallDecimalPoint(True)
 
         self.runStopButton.clicked.connect(self.RunStopData)
@@ -87,14 +91,74 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if path.isfile(self.globalSettings):
             self.LoadGlobalSettings(self.globalSettings)
 
-    def LoadGlobalSettings(self, globalSettings):
-        if path.isfile(globalSettings):
-            self.globalSettings = globalSettings
-            loadedSettings = yaml.load(self.globalSettings)
+    def LoadGlobalSettings(self, fileName):
+        if path.isfile(fileName):
+            self.globalSettingsFileName = fileName
+            loadedSettings = yaml.load(self.globalSettingsFileName)
 
-    def SaveGlobalSettings(self, globalSettings):
-        if path.isfile(globalSettings):
-            self.globalSettings = globalSettings
+    def SaveGlobalSettings(self, fileName=None):
+        if path.isfile(fileName):
+            self.globalSettingsFileName = fileName
+        self.SaveSensorSettings(0xDEADBEEF)
+        self.SaveExperimentSettings(0xDEADBEEF)
+        sensorSettings = yaml.load('temp-sensor.yaml')
+        exmperimentSettings = yaml.load('temp-experiment.yaml')
+        saveData = {'Sensor' : sensorSettings,
+                    'Experiment' : exmperimentSettings}
+        print(saveData)
+
+    def SaveSensorSettings(self, fileName=None):
+        saveData = {'Flow Meter' : self.resolutionSettingSpinBox.value(),
+                    'Pressure Transducer' : {'High Side-Left' : self.leftTransducerRadioButton.isChecked(),
+                                             'Left' : {'Slope' : self.leftTransducerSlopeLineEdit.text(),
+                                                       'Intercept' : self.leftTransducerInterceptLineEdit.text(),
+                                                       'Units' : self.leftTransducerPressureUnitsLineEdit.text(),
+                                                       'Serial' : self.leftTransducerSerialLineEdit.text(),
+                                                       'Type' : self.leftTransducerTypeLineEdit.text()},
+                                             'Right' : {'Slope' : self.rightTransducerSlopeLineEdit.text(),
+                                                       'Intercept' : self.rightTransducerInterceptLineEdit.text(),
+                                                       'Units' : self.rightTransducerPressureUnitsLineEdit.text(),
+                                                       'Serial' : self.rightTransducerSerialLineEdit.text(),
+                                                       'Type' : self.rightTransducerTypeLineEdit.text()}},
+                    'Save' : self.loadFlowReaderSettingsLineEdit.text()}
+        if fileName is None:
+            with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
+        if path.isfile(fileName):
+            saveData['Save'] = fileName
+            with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
+        if fileName is 0xDEADBEEF:
+            with open('temp-sensor.yaml', 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
+
+    def SaveExperimentSettings(self, fileName=None):
+        saveData = {'Experiment Settings' : {'Results Save' : self.saveResultsNameLineEdit.text(),
+                                             'Cross Section' : self.crossSectionLineEdit.text(),
+                                             'Cross Section Units' : self.crossSectionUnitsComboBox.currentText(),
+                                             'Tissue Thickness' : self.tissueThicknessLineEdit.text(),
+                                             'Tissue Thickness Units' : self.tissueThicknessUnitsComboBox.currentText(),
+                                             'Flow Setpoint' : self.flowSetpointLineEdit.text(),
+                                             'Flow Setpoint Units' : self.flowSetpointUnitsComboBox.currentText(),
+                                             'Averaging Depth' : self.averagingDepthSpinBox.value(),
+                                             'Flow Error Bounds' : self.errorBoundsLineEdit.text(),
+                                             'Flow Error Units' : self.errorBoundsUnitsComboBox.currentText(),
+                                             'Lock Time' : self.lockTimeLineEdit.text(),
+                                             'Lock Time Units' : self.lockTimeUnitsComboBox.currentText(),
+                                             'Done Sound' : self.soundDoneCheckBox.isChecked(),
+                                             'Done LED' : self.ledDoneCheckBox.isChecked(),
+                                             'Done Pop-Up' : self.popUpDoneCheckBox.isChecked(),
+                                             'Save' : self.loadExperimentSettingsLineEdit.text()}}
+        if fileName is None:
+            with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
+        if path.isfile(fileName):
+            saveData['Save'] = fileName
+            with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
+        if fileName is 0xDEADBEEF:
+            with open('temp-experiment.yaml', 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
 
     def RunStopData(self):
         if self.currentlyRunning:
@@ -134,6 +198,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.setIcon(QMessageBox.Information)
                     self.msg.setStandardButtons(QMessageBox.Ok)
                     self.msg.show()
+                if self.soundDoneCheckBox.isChecked():
+                    playsound.playsound(self.doneSound)
                 self.RunStopData()
                 return
 
