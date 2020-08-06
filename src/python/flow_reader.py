@@ -40,8 +40,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                                   'torr' : 133.322}
         self.flowRates = [''.join([volumeUnit, '/', timeUnit]) for volumeUnit in self.volumeUnitsDict.keys() for timeUnit in self.timeUnitsDict.keys()]
 
-        self.doneSound = playsound.input('done.wav')
-
         # Set input validators
         self.flowSetpointLineEdit.setValidator(QDoubleValidator())
         self.errorBoundsLineEdit.setValidator(QDoubleValidator())
@@ -199,7 +197,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.setStandardButtons(QMessageBox.Ok)
                     self.msg.show()
                 if self.soundDoneCheckBox.isChecked():
-                    playsound.playsound(self.doneSound)
+                    playsound.playsound('done.wav')
                 self.RunStopData()
                 return
 
