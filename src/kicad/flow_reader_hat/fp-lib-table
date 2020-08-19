@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Bioparts)(type KiCad)(uri ${KIPRJMOD}/../footprint_libraries/Bioparts.pretty)(options "")(descr ""))
+  (lib (name logo)(type KiCad)(uri ${KIPRJMOD}/../footprint_libraries/logo.pretty)(options "")(descr ""))
+)

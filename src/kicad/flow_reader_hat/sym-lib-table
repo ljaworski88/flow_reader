@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name sensor)(type Legacy)(uri /home/lukas/Dropbox/Lab/Tools/FlowReader/src/kicad/component_libraries/Bioreactor.lib)(options "")(descr ""))
+  (lib (name flow_reader_hat-rescue)(type Legacy)(uri ${KIPRJMOD}/flow_reader_hat-rescue.lib)(options "")(descr ""))
+)

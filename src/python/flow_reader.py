@@ -2,10 +2,11 @@
 
 from sf04_sensor.sf04 import *
 import playsound
+import visa
 from time import sleep, time
 from collections import deque
 from statistics import mean
-from os import system, path
+from os import system, path, remove
 import sys
 import yaml
 from mainWindow import Ui_MainWindow
@@ -16,13 +17,15 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 import random
 
 class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None, lastSettings='settings.yaml'):
+    def __init__(self, parent=None, lastSettings='global-settings'):
         super(StreamingPotentialApp, self).__init__(parent)
         self.setupUi(self)
         # Set the main page of the app
         self.mainTabStack.setCurrentIndex(0)
         self.graphsTab.setCurrentIndex(0)
         self.globalSettings = lastSettings
+        self.visaResourceManager = visa.ResourceManager('@py')
+        #TODO fix open resource name
 
         # Initialize some dicts and lists that will be used in conversions later
         self.timeUnitsDict = {'sec' : 1,
@@ -53,27 +56,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         self.statusMessage = 'Welcome!'
         self.i2c_bus = SMBus(3)
+        self.i2c_bus2 = SMBus(1)
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
-        self.timerInterval = 250
-        self.lockTime = 10 * 60 # 5min * 60 sec
+        self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
+        self.lockTime = 5 * 60 # 5min * 60 sec
         self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
         self.unitsComboBox.addItems(self.flowRates)
-        self.unitsComboBox.setCurrentText('nL/min')
-        self.flowSetpointLineEdit.setText('3300')
         self.flowSetpointUnitsComboBox.addItems(self.flowRates)
-        self.flowSetpointUnitsComboBox.setCurrentText('nL/min')
-        self.errorBoundsLineEdit.setText('300')
         self.errorBoundsUnitsComboBox.addItem('%')
         self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
-        self.errorBoundsUnitsComboBox.setCurrentText(self.flowSetpointUnitsComboBox.currentText())
 
         self.lockTimeUnitsComboBox.addItems(['sec', 'min', 'hr'])
         self.lockTimeUnitsComboBox.setCurrentText('min')
         self.lockTimeUnitsComboBox.currentIndexChanged.connect(self.UpdateLockTime)
-        self.lockTimeLineEdit.setText('10')
+        self.lockTimeLineEdit.setText('5')
         self.lockTimeLineEdit.editingFinished.connect(self.UpdateLockTime)
-        self.lockTimeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
         self.currentReadingLCD.setSmallDecimalPoint(True)
 
         self.runStopButton.clicked.connect(self.RunStopData)
@@ -89,25 +87,96 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if path.isfile(self.globalSettings):
             self.LoadGlobalSettings(self.globalSettings)
 
+        self.resolutionSettingSpinBox.valueChanged.connect(self.SaveGlobalSettings)
+        self.leftTransducerRadioButton.clicked.connect(self.SaveGlobalSettings)
+        self.rightTransducerRadioButton.clicked.connect(self.SaveGlobalSettings)
+        self.leftTransducerSlopeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.leftTransducerInterceptLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.leftTransducerPressureUnitsLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.leftTransducerSerialLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.leftTransducerTypeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.rightTransducerSlopeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.rightTransducerInterceptLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.rightTransducerPressureUnitsLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.rightTransducerSerialLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.rightTransducerTypeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.loadFlowReaderSettingsLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.saveResultsNameLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.crossSectionLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.crossSectionUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
+        self.tissueThicknessLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.tissueThicknessUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
+        self.flowSetpointLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
+        self.averagingDepthSpinBox.valueChanged.connect(self.SaveGlobalSettings)
+        self.errorBoundsLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.errorBoundsUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
+        self.lockTimeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
+        self.lockTimeUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
+        self.soundDoneCheckBox.stateChanged.connect(self.SaveGlobalSettings)
+        self.ledDoneCheckBox.stateChanged.connect(self.SaveGlobalSettings)
+        self.popUpDoneCheckBox.stateChanged.connect(self.SaveGlobalSettings)
+        self.unitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
+        self.runStopButton.clicked.connect(self.SaveGlobalSettings)
+
     def LoadGlobalSettings(self, fileName):
         if path.isfile(fileName):
             self.globalSettingsFileName = fileName
             loadedSettings = yaml.load(self.globalSettingsFileName)
+
+            self.resolutionSettingSpinBox.setValue(loadedSettings['Sensor']['Flow Meter'])
+
+            self.leftTransducerRadioButton.setDown(loadedSettings['Sensor']['Pressure Transducer']['High Side-Left'])
+            self.leftTransducerSlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Slope'])
+            self.leftTransducerInterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Intercept'])
+            self.leftTransducerPressureUnitsLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Units'])
+            self.leftTransducerSerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Serial'])
+            self.leftTransducerTypeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Type'])
+
+            self.rightTransducerRadioButton.setDown(loadedSettings['Sensor']['Pressure Transducer']['High Side-Right'])
+            self.rightTransducerSlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Slope'])
+            self.rightTransducerInterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Intercept'])
+            self.rightTransducerPressureUnitsLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Units'])
+            self.rightTransducerSerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Serial'])
+            self.rightTransducerTypeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Type'])
+
+            self.saveResultsNameLineEdit.setText(loadedSettings['Experiment']['Results Save'])
+            self.crossSectionLineEdit.setText(loadedSettings['Experiment']['Cross Section'])
+            self.crossSectionUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Cross Section Units'])
+            self.tissueThicknessLineEdit.setText(loadedSettings['Experiment']['Tissue Thickness'])
+            self.tissueThicknessUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Tissue Thickness Units'])
+            self.flowSetpointLineEdit.setText(loadedSettings['Experiment']['Flow Setpoint'])
+            self.flowSetpointUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Setpoint Units'])
+            self.averagingDepthSpinBox.value(loadedSettings['Experiment']['Averaging Depth'])
+            self.errorBoundsLineEdit.setText(loadedSettings['Experiment']['Flow Error Bounds'])
+            self.errorBoundsUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Error Units'])
+            self.lockTimeLineEdit.setText(loadedSettings['Experiment']['Lock Time'])
+            self.lockTimeUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Lock Time Units'])
+            self.soundDoneCheckBox.setDown(loadedSettings['Experiment']['Done Sound'])
+            self.ledDoneCheckBox.setDown(loadedSettings['Experiment']['Done LED'])
+            self.popUpDoneCheckBox.setDown(loadedSettings['Experiment']['Done Pop-Up'])
+            self.loadExperimentSettingsLineEdit.setText(loadedSettings['Experiment']['Save'])
 
     def SaveGlobalSettings(self, fileName=None):
         if path.isfile(fileName):
             self.globalSettingsFileName = fileName
         self.SaveSensorSettings(0xDEADBEEF)
         self.SaveExperimentSettings(0xDEADBEEF)
-        sensorSettings = yaml.load('temp-sensor.yaml')
-        exmperimentSettings = yaml.load('temp-experiment.yaml')
+        sensorSettings = yaml.load('temp-sensor-settings')
+        exmperimentSettings = yaml.load('temp-experiment-settings')
         saveData = {'Sensor' : sensorSettings,
                     'Experiment' : exmperimentSettings}
+        remove('temp-sensor-settings')
+        remove('temp-experiment-settings')
         print(saveData)
+        if fileName is None:
+            with open('global-settings', 'w') as saveSensor:
+                saveSensor.write(yaml.dump(saveData))
 
     def SaveSensorSettings(self, fileName=None):
         saveData = {'Flow Meter' : self.resolutionSettingSpinBox.value(),
                     'Pressure Transducer' : {'High Side-Left' : self.leftTransducerRadioButton.isChecked(),
+                                             'High Side-Right' : self.rightTransducerRadioButton.isChecked(),
                                              'Left' : {'Slope' : self.leftTransducerSlopeLineEdit.text(),
                                                        'Intercept' : self.leftTransducerInterceptLineEdit.text(),
                                                        'Units' : self.leftTransducerPressureUnitsLineEdit.text(),
@@ -127,26 +196,26 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
                 saveSensor.write(yaml.dump(saveData))
         if fileName is 0xDEADBEEF:
-            with open('temp-sensor.yaml', 'w') as saveSensor:
+            with open('temp-sensor-settings', 'w') as saveSensor:
                 saveSensor.write(yaml.dump(saveData))
 
     def SaveExperimentSettings(self, fileName=None):
-        saveData = {'Experiment Settings' : {'Results Save' : self.saveResultsNameLineEdit.text(),
-                                             'Cross Section' : self.crossSectionLineEdit.text(),
-                                             'Cross Section Units' : self.crossSectionUnitsComboBox.currentText(),
-                                             'Tissue Thickness' : self.tissueThicknessLineEdit.text(),
-                                             'Tissue Thickness Units' : self.tissueThicknessUnitsComboBox.currentText(),
-                                             'Flow Setpoint' : self.flowSetpointLineEdit.text(),
-                                             'Flow Setpoint Units' : self.flowSetpointUnitsComboBox.currentText(),
-                                             'Averaging Depth' : self.averagingDepthSpinBox.value(),
-                                             'Flow Error Bounds' : self.errorBoundsLineEdit.text(),
-                                             'Flow Error Units' : self.errorBoundsUnitsComboBox.currentText(),
-                                             'Lock Time' : self.lockTimeLineEdit.text(),
-                                             'Lock Time Units' : self.lockTimeUnitsComboBox.currentText(),
-                                             'Done Sound' : self.soundDoneCheckBox.isChecked(),
-                                             'Done LED' : self.ledDoneCheckBox.isChecked(),
-                                             'Done Pop-Up' : self.popUpDoneCheckBox.isChecked(),
-                                             'Save' : self.loadExperimentSettingsLineEdit.text()}}
+        saveData = {'Results Save' : self.saveResultsNameLineEdit.text(),
+                    'Cross Section' : self.crossSectionLineEdit.text(),
+                    'Cross Section Units' : self.crossSectionUnitsComboBox.currentText(),
+                    'Tissue Thickness' : self.tissueThicknessLineEdit.text(),
+                    'Tissue Thickness Units' : self.tissueThicknessUnitsComboBox.currentText(),
+                    'Flow Setpoint' : self.flowSetpointLineEdit.text(),
+                    'Flow Setpoint Units' : self.flowSetpointUnitsComboBox.currentText(),
+                    'Averaging Depth' : self.averagingDepthSpinBox.value(),
+                    'Flow Error Bounds' : self.errorBoundsLineEdit.text(),
+                    'Flow Error Units' : self.errorBoundsUnitsComboBox.currentText(),
+                    'Lock Time' : self.lockTimeLineEdit.text(),
+                    'Lock Time Units' : self.lockTimeUnitsComboBox.currentText(),
+                    'Done Sound' : self.soundDoneCheckBox.isChecked(),
+                    'Done LED' : self.ledDoneCheckBox.isChecked(),
+                    'Done Pop-Up' : self.popUpDoneCheckBox.isChecked(),
+                    'Save' : self.loadExperimentSettingsLineEdit.text()}
         if fileName is None:
             with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
                 saveSensor.write(yaml.dump(saveData))
@@ -155,13 +224,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
                 saveSensor.write(yaml.dump(saveData))
         if fileName is 0xDEADBEEF:
-            with open('temp-experiment.yaml', 'w') as saveSensor:
+            with open('temp-experiment-settings', 'w') as saveSensor:
                 saveSensor.write(yaml.dump(saveData))
 
     def RunStopData(self):
         if self.currentlyRunning:
             self.currentlyRunning = False
             self.dataTimer.stop()
+            self.sourceMeter.close()
             self.runStopButton.setText('Run')
             self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store 30 min of data
             self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store 30 min of data
@@ -178,6 +248,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             set_read_data(self.i2c_bus)
             self.sensorInfo.setText('Running')
             self.runStopButton.setText('Stop')
+
+            self.sourceMeter = self.visaResourceManager.open_resource('ACRL::')
+            self.sourceMeter.write('*RST')
+            self.sourceMeter.write(":SENS:FUNC 'RES' ")
+            self.sourceMeter.write(":SENS:RES:NPLC 1")
+            self.sourceMeter.write(":SENS:RES:MODE AUTO")
 
     def UpdateData(self):
         self.timeData.append(time())
