@@ -55,8 +55,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        # self.i2c_bus = SMBus(3)
-        # self.i2c_bus2 = SMBus(1)
+        self.i2c_bus = SMBus(3)
+        self.i2c_bus2 = SMBus(1)
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
         self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
@@ -258,8 +258,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.sensorInfo.setText('Running')
             self.runStopButton.setText('Stop')
 
-            self.sourceMeter = self.visaResourceManager.open_resource('ACRL::')
-            self.sourceMeter.write('*RST')
+            self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
+            self.sourceMeter.write("*RST")
             self.sourceMeter.write(":SENS:FUNC 'RES' ")
             self.sourceMeter.write(":SENS:RES:NPLC 1")
             self.sourceMeter.write(":SENS:RES:MODE AUTO")
