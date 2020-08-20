@@ -674,11 +674,14 @@ color: rgb(238, 238, 236);</string>
             </item>
             <item>
              <widget class="QCheckBox" name="popUpDoneCheckBox">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="text">
                <string>Pop-Up with Results When Done</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>

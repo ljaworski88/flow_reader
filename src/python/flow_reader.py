@@ -55,8 +55,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        self.i2c_bus = SMBus(3)
-        self.i2c_bus2 = SMBus(1)
+        # self.i2c_bus = SMBus(3)
+        # self.i2c_bus2 = SMBus(1)
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
         self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
@@ -74,6 +74,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.editingFinished.connect(self.UpdateLockTime)
         self.currentReadingLCD.setSmallDecimalPoint(True)
 
+        self.runStopButton.clicked.connect(self.SaveGlobalSettings)
         self.runStopButton.clicked.connect(self.RunStopData)
         self.currentlyRunning = False
         self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
@@ -117,23 +118,23 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.ledDoneCheckBox.stateChanged.connect(self.SaveGlobalSettings)
         self.popUpDoneCheckBox.stateChanged.connect(self.SaveGlobalSettings)
         self.unitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
-        self.runStopButton.clicked.connect(self.SaveGlobalSettings)
 
     def LoadGlobalSettings(self, fileName):
         if path.isfile(fileName):
             self.globalSettingsFileName = fileName
-            loadedSettings = yaml.load(self.globalSettingsFileName)
+            with open(self.globalSettingsFileName, 'r') as settings:
+                loadedSettings = yaml.full_load(settings)
 
             self.resolutionSettingSpinBox.setValue(loadedSettings['Sensor']['Flow Meter'])
 
-            self.leftTransducerRadioButton.setDown(loadedSettings['Sensor']['Pressure Transducer']['High Side-Left'])
+            self.leftTransducerRadioButton.setChecked(loadedSettings['Sensor']['Pressure Transducer']['High Side-Left'])
             self.leftTransducerSlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Slope'])
             self.leftTransducerInterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Intercept'])
             self.leftTransducerPressureUnitsLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Units'])
             self.leftTransducerSerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Serial'])
             self.leftTransducerTypeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Type'])
 
-            self.rightTransducerRadioButton.setDown(loadedSettings['Sensor']['Pressure Transducer']['High Side-Right'])
+            self.rightTransducerRadioButton.setChecked(loadedSettings['Sensor']['Pressure Transducer']['High Side-Right'])
             self.rightTransducerSlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Slope'])
             self.rightTransducerInterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Intercept'])
             self.rightTransducerPressureUnitsLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Units'])
@@ -147,31 +148,37 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.tissueThicknessUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Tissue Thickness Units'])
             self.flowSetpointLineEdit.setText(loadedSettings['Experiment']['Flow Setpoint'])
             self.flowSetpointUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Setpoint Units'])
-            self.averagingDepthSpinBox.value(loadedSettings['Experiment']['Averaging Depth'])
+            self.averagingDepthSpinBox.setValue(loadedSettings['Experiment']['Averaging Depth'])
             self.errorBoundsLineEdit.setText(loadedSettings['Experiment']['Flow Error Bounds'])
             self.errorBoundsUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Error Units'])
             self.lockTimeLineEdit.setText(loadedSettings['Experiment']['Lock Time'])
             self.lockTimeUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Lock Time Units'])
-            self.soundDoneCheckBox.setDown(loadedSettings['Experiment']['Done Sound'])
-            self.ledDoneCheckBox.setDown(loadedSettings['Experiment']['Done LED'])
-            self.popUpDoneCheckBox.setDown(loadedSettings['Experiment']['Done Pop-Up'])
+            self.soundDoneCheckBox.setChecked(loadedSettings['Experiment']['Done Sound'])
+            self.ledDoneCheckBox.setChecked(loadedSettings['Experiment']['Done LED'])
+            self.popUpDoneCheckBox.setChecked(loadedSettings['Experiment']['Done Pop-Up'])
             self.loadExperimentSettingsLineEdit.setText(loadedSettings['Experiment']['Save'])
 
-    def SaveGlobalSettings(self, fileName=None):
-        if path.isfile(fileName):
-            self.globalSettingsFileName = fileName
+    def SaveGlobalSettings(self):
         self.SaveSensorSettings(0xDEADBEEF)
         self.SaveExperimentSettings(0xDEADBEEF)
-        sensorSettings = yaml.load('temp-sensor-settings')
-        exmperimentSettings = yaml.load('temp-experiment-settings')
+        with open('temp-sensor-settings', 'r') as settings:
+            sensorSettings = yaml.full_load(settings)
+            # print('Sensor Settings:')
+            # print(sensorSettings)
+        with open('temp-experiment-settings', 'r') as settings:
+            exmperimentSettings = yaml.full_load(settings)
+            # print('Experiment Settings:')
+            # print(exmperimentSettings)
         saveData = {'Sensor' : sensorSettings,
                     'Experiment' : exmperimentSettings}
         remove('temp-sensor-settings')
         remove('temp-experiment-settings')
-        print(saveData)
-        if fileName is None:
-            with open('global-settings', 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
+        # if fileName or fileName is None:
+        with open('global-settings', 'w') as saveSettings:
+            yaml.dump(saveData, saveSettings)
+        # else:
+            # with open(fileName, 'w') as saveSettings:
+                # yaml.dump(saveData, saveSettings)
 
     def SaveSensorSettings(self, fileName=None):
         saveData = {'Flow Meter' : self.resolutionSettingSpinBox.value(),
@@ -188,16 +195,17 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                                                        'Serial' : self.rightTransducerSerialLineEdit.text(),
                                                        'Type' : self.rightTransducerTypeLineEdit.text()}},
                     'Save' : self.loadFlowReaderSettingsLineEdit.text()}
-        if fileName is None:
-            with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
-        if path.isfile(fileName):
-            saveData['Save'] = fileName
-            with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
-        if fileName is 0xDEADBEEF:
+        if fileName == 0xDEADBEEF:
             with open('temp-sensor-settings', 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
+                yaml.dump(saveData, saveSensor)
+        else:
+            if fileName is None:
+                with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
+            if path.isfile(fileName):
+                saveData['Save'] = fileName
+                with open(self.loadFlowReaderSettingsLineEdit.text(), 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
 
     def SaveExperimentSettings(self, fileName=None):
         saveData = {'Results Save' : self.saveResultsNameLineEdit.text(),
@@ -216,16 +224,17 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     'Done LED' : self.ledDoneCheckBox.isChecked(),
                     'Done Pop-Up' : self.popUpDoneCheckBox.isChecked(),
                     'Save' : self.loadExperimentSettingsLineEdit.text()}
-        if fileName is None:
-            with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
-        if path.isfile(fileName):
-            saveData['Save'] = fileName
-            with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
-        if fileName is 0xDEADBEEF:
+        if fileName == 0xDEADBEEF:
             with open('temp-experiment-settings', 'w') as saveSensor:
-                saveSensor.write(yaml.dump(saveData))
+                yaml.dump(saveData, saveSensor)
+        else:
+            if fileName is None:
+                with open(self.loadExperimentSettingsLineEdit.text(), 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
+            if path.isfile(fileName):
+                saveData['Save'] = fileName
+                with open(fileName, 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
 
     def RunStopData(self):
         if self.currentlyRunning:
@@ -318,45 +327,6 @@ def main():
     form = StreamingPotentialApp()
     form.show()
     sys.exit(app.exec_())
-
-def old_faithful():
-    with SMBus(3) as bus:
-        reset_sensor(bus)
-        print("Sensor reset!")
-        sleep(0.5)
-        system('clear')
-
-        sensor, serial_number, _, _ = read_product_info(bus)
-        scale_factor, units, _, _ = read_scale_and_unit(bus)
-        print('Sensor is:')
-        print(sensor)
-        print('Serial Number:')
-        print(serial_number)
-        print('Scale Factor:')
-        print(scale_factor)
-        print('Units:')
-        print(units)
-        sleep(3)
-
-        set_read_data(bus)
-        timeout_buffer = deque([], 3000)
-        while True:
-            raw_flow_reading, _, _ = read_raw_data(bus, True)
-            scaled_flow_reading = scale_reading(raw_flow_reading, scale_factor)
-            print('The current flow rate is: {} {}'.format(scaled_flow_reading, units))
-            if 3100 < scaled_flow_reading < 3500:
-                timeout_buffer.append((time(), scaled_flow_reading))
-                if len(timeout_buffer) > 2500:
-                    _, beggining_average = zip(*list(timeout_buffer)[:100])
-                    beggining_average = mean(beggining_average)
-                    _, ending_average = zip(*list(timeout_buffer)[-100:])
-                    ending_average = mean(ending_average)
-                    if abs(beggining_average-ending_average) < 100:
-                        print('ALL DONE!!')
-                    else:
-                        print('Approaching the end')
-            sleep(0.25)
-            system('clear')
 
 if __name__ == '__main__':
     main()
