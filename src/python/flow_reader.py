@@ -67,8 +67,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        # self.i2c_bus = SMBus(3)
-        # self.i2c_bus2 = SMBus(1)
+        self.i2c_bus = SMBus(3)
+        self.i2c_bus2 = SMBus(1)
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
         self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
@@ -257,11 +257,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.dataTimer.stop()
             self.sourceMeter.close()
             self.runStopButton.setText('Run')
-            self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store 30 min of data
-            self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store 30 min of data
+            self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+            self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.sensorInfo.setText('Stopped')
         else:
             self.dataTimer.start(self.timerInterval)
+            self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+            self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.currentlyRunning = True
             reset_sensor(self.i2c_bus)
             sleep(0.5)
