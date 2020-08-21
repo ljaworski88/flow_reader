@@ -15,18 +15,20 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 import random
+import serial
+# import RPi.GPIO as gpio
 
 class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, lastSettings='global-settings'):
         super(StreamingPotentialApp, self).__init__(parent)
         self.setupUi(self)
+        self.setWindowTitle('Streaming Potential Calculator')
+        self.setWindowIcon(QtGui.QIcon('logo.png'))
         # Set the main page of the app
         self.mainTabStack.setCurrentIndex(0)
         self.graphsTab.setCurrentIndex(0)
         self.globalSettings = lastSettings
         self.visaResourceManager = visa.ResourceManager('@py')
-        #TODO fix open resource name
-
         # Initialize some dicts and lists that will be used in conversions later
         self.timeUnitsDict = {'sec' : 1,
                               'min' : 60,
@@ -41,6 +43,16 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                                   'atm'  : 101325,
                                   'mmHg' : 133.322,
                                   'torr' : 133.322}
+        self.thicknessUnitsDict = {'m'  : 1,
+                                   'cm' : 1e-2,
+                                   'mm' : 1e-3,
+                                   'um' : 1e-6,
+                                   'nm' : 1e-9}
+        self.areaUnitsDict = {'m^2'  : 1,
+                              'cm^2' : 1e-4,
+                              'mm^2' : 1e-9,
+                              'um^2' : 1e-36,
+                              'nm^2' : 1e-81}
         self.flowRates = [''.join([volumeUnit, '/', timeUnit]) for volumeUnit in self.volumeUnitsDict.keys() for timeUnit in self.timeUnitsDict.keys()]
 
         # Set input validators
@@ -55,17 +67,20 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        self.i2c_bus = SMBus(3)
-        self.i2c_bus2 = SMBus(1)
+        # self.i2c_bus = SMBus(3)
+        # self.i2c_bus2 = SMBus(1)
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
         self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
         self.lockTime = 5 * 60 # 5min * 60 sec
         self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
         self.unitsComboBox.addItems(self.flowRates)
+        self.unitsComboBox.setCurrentText('nL/min')
         self.flowSetpointUnitsComboBox.addItems(self.flowRates)
         self.errorBoundsUnitsComboBox.addItem('%')
         self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
+        self.crossSectionUnitsComboBox.addItems(self.areaUnitsDict.keys())
+        self.tissueThicknessUnitsComboBox.addItems(self.thicknessUnitsDict.keys())
 
         self.lockTimeUnitsComboBox.addItems(['sec', 'min', 'hr'])
         self.lockTimeUnitsComboBox.setCurrentText('min')
@@ -283,6 +298,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.show()
                 if self.soundDoneCheckBox.isChecked():
                     playsound.playsound('done.wav')
+                if self.ledDoneCheckBox.isChecked():
+                    pass
                 self.RunStopData()
                 return
 
