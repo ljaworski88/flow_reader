@@ -68,7 +68,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        # self.i2c_bus = SMBus(3)
+        self.i2c_bus = SMBus(3)
         # self.i2c_bus2 = SMBus(1)
         self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
@@ -293,7 +293,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
             # boot_cycle(i2c_bus)
             # boot_cycle(i2c_bus2)
-            # reset_sensor(self.i2c_bus)
+            reset_sensor(self.i2c_bus)
             # self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
             # self.sourceMeter.write("*RST")
             sleep(0.5)
@@ -313,10 +313,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
             # Set up the flow sensor
 
-            # self.sensor, self.serialNumber, _, _ = read_product_info(self.i2c_bus)
-            # self.scaleFactor, self.units, _, _ = read_scale_and_unit(self.i2c_bus)
-            # set_resolution(self.i2c_bus, bits=self.resolutionSettingSpinBox.value())
-            # set_read_data(self.i2c_bus)
+            self.sensor, self.serialNumber, _, _ = read_product_info(self.i2c_bus)
+            self.scaleFactor, self.units, _, _ = read_scale_and_unit(self.i2c_bus)
+            set_resolution(self.i2c_bus, bits=self.resolutionSettingSpinBox.value())
+            set_read_data(self.i2c_bus)
 
             # Set up the sourcemeter for voltage and current
 
@@ -338,19 +338,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def UpdateData(self):
         self.timeData.append(time())
-        # rawFlowReading, _, _ = read_raw_data(self.i2c_bus)
-        # scaledFlowReading = scale_reading(rawFlowReading, self.scaleFactor)
+        rawFlowReading, _, _ = read_raw_data(self.i2c_bus)
+        scaledFlowReading = scale_reading(rawFlowReading, self.scaleFactor)
+
         # rawLeftTransducerReading = read_load(i2c_bus)
         # rawRightTransducerReading = read_load(i2c_bus2)
         # pressureDifferentialReading = self.PressureDifferential(rawLeftTransducerReading, rawRightTransducerReading)
+
         # voltageReading = self.sourceMeter.query('*READ')
         # currentReading = self.sourceMeter.query('*READ')
 
         ## Not on Pi Testing
-        scaledFlowReading = random.randrange(3000, 3500)
+        # scaledFlowReading = random.randrange(3000, 3500)
         pressureDifferentialReading = random.randrange(100000, 200000)
         voltageReading = random.randrange(-1, 1)
         currentReading = random.randrange(-1, 1)
+
         self.flowData.append(scaledFlowReading)
         self.pressureData.append(pressureDifferentialReading)
         self.voltageData.append(voltageReading)
