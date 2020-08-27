@@ -7,29 +7,27 @@ Experiment:
   Done Sound: true
   Flow Error Bounds: '1'
   Flow Error Units: '%'
-  Flow Setpoint: '50'
+  Flow Setpoint: '500'
   Flow Setpoint Units: nL/min
   Lock Time: '5'
   Lock Time Units: min
   Results Save: results.csv
   Save: ''
-  Tissue Thickness: '1'
+  Tissue Thickness: '12'
   Tissue Thickness Units: mm
 Sensor:
   Flow Meter: 16
   Pressure Transducer:
-    High Side-Left: false
-    High Side-Right: true
+    High Side-Left: true
+    High Side-Right: false
     Left:
-      Intercept: ''
+      Intercept: '4'
       Serial: ''
-      Slope: ''
-      Type: ''
-      Units: ''
+      Slope: '5'
+      Units: Pa
     Right:
-      Intercept: ''
+      Intercept: '4'
       Serial: ''
-      Slope: ''
-      Type: ''
-      Units: ''
+      Slope: '5'
+      Units: Pa
   Save: ''
