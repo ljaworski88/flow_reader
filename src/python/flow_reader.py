@@ -38,8 +38,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         gpio.setmode(gpio.BCM)
         self.doneLED = 9
         self.errorLED = 11
-        gpio.setup(self.doneLED, gpio.out)
-        gpio.setup(self.errorLED, gpio.out)
+        gpio.setup(self.doneLED, gpio.OUT)
+        gpio.setup(self.errorLED, gpio.OUT)
 
         self.dataTimer = QtCore.QTimer(self)
         self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
