@@ -25,12 +25,30 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle('Streaming Potential Calculator')
         self.setWindowIcon(QtGui.QIcon('logo.png'))
-        # Set the main page of the app
+
+        ## Set the main page of the app
         self.mainTabStack.setCurrentIndex(0)
         self.graphsTab.setCurrentIndex(0)
         self.globalSettings = lastSettings
+
+        ## Initalize some library resource, state variables, and data arrays for later
+        self.dataTimer = QtCore.QTimer(self)
+        self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
+        self.lockTime = 5 * 60 # 5min * 60 sec
+
+        self.currentlyRunning = False
+        self.logData = False
+
+        self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
+        self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        self.i2c_bus = SMBus(3)
+        # self.i2c_bus2 = SMBus(1)
         self.visaResourceManager = visa.ResourceManager('@py')
-        # Initialize some dicts and lists that will be used in conversions later
+
+        ## Initialize some dicts and lists that will be used in conversions later
         self.timeUnitsDict = {'sec' : 1,
                               'min' : 60,
                               'hr'  : 3600}
@@ -68,13 +86,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        self.i2c_bus = SMBus(3)
-        # self.i2c_bus2 = SMBus(1)
-        self.dataTimer = QtCore.QTimer(self)
         self.dataTimer.timeout.connect(self.UpdateData)
-        self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
-        self.lockTime = 5 * 60 # 5min * 60 sec
-        self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
         self.unitsComboBox.addItems(self.flowRates)
         self.unitsComboBox.setCurrentText('nL/min')
         self.flowSetpointUnitsComboBox.addItems(self.flowRates)
@@ -95,11 +107,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
         self.runStopButton.clicked.connect(self.RunStopData)
-        self.currentlyRunning = False
-        self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-        self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-        self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-        self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        self.logButton.clicked.connect(self.StartStopLogging)
 
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.unitsComboBox.currentText()))
         self.flowGraph.getAxis('bottom').setLabel('Time (sec)')
@@ -253,6 +261,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 saveData['Save'] = fileName
                 with open(fileName, 'w') as saveSensor:
                     yaml.dump(saveData, saveSensor)
+
     def LoadCailbration(self, transducer):
         pass
 
@@ -268,13 +277,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.dataTimer.stop()
             # self.sourceMeter.close()
             self.runStopButton.setText('Run')
-            self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.rightPressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.leftPressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.sensorInfo.setText('Stopped')
+            self.runStatusLabel.setText('Stopped')
         else:
             self.dataTimer.start(self.timerInterval)
             self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
@@ -289,7 +292,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             if not self.leftTransducerInterceptLineEdit.text() or not self.rightTransducerInterceptLineEdit.text():
                 raise(ValueError('Both left and right transducers need calibration values'))
 
-            # Reset the pressure and flow chips on the I2C buses
+            ## Reset the pressure and flow chips on the I2C buses
 
             # boot_cycle(i2c_bus)
             # boot_cycle(i2c_bus2)
@@ -323,9 +326,18 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             # self.sourceMeter.write(":SENS:FUNC 'RES' ")
             # self.sourceMeter.write(":SENS:RES:NPLC 1")
             # self.sourceMeter.write(":SENS:RES:MODE AUTO")
-            self.sensorInfo.setText('Running')
+            self.runStatusLabel.setText('Running')
             self.runStopButton.setText('Stop')
 
+    def StartStopLogging(self):
+        if self.logData:
+            self.logData = False
+            self.logButton.setText('Start Logging')
+        else:
+            self.logData = True
+            self.logButton.setText('Stop Logging')
+            with open(self.logFileLineEdit.text(), 'x') as fileHeader:
+                fileHeader.write('Time, Flow Rate (nL/min), Pressure (Pa), Current (A), Voltage (V)\n')
 
     def PressureDifferential(self, rawLeftTransducerReading, rawRightTransducerReading):
         leftReading = float(self.leftTransducerSlopeLineEdit) * rawLeftTransducerReading + self.leftTransducerInterceptLineEdit
@@ -337,7 +349,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
 
     def UpdateData(self):
-        self.timeData.append(time())
+        timepoint = time()
+        self.timeData.append(timepoint)
         rawFlowReading, _, _ = read_raw_data(self.i2c_bus)
         scaledFlowReading = scale_reading(rawFlowReading, self.scaleFactor)
 
@@ -353,6 +366,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         pressureDifferentialReading = random.randrange(100000, 200000)
         voltageReading = random.randrange(-1, 1)
         currentReading = random.randrange(-1, 1)
+        if self.logData:
+            with open(self.logFileLineEdit.text(), 'a') as data:
+                data.write('{},{},{},{},{}\n'.format(timepoint, scaledFlowReading, pressureDifferentialReading, currentReading, voltageReading))
 
         self.flowData.append(scaledFlowReading)
         self.pressureData.append(pressureDifferentialReading)

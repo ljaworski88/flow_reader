@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -91,7 +91,7 @@
             <item>
              <widget class="QPushButton" name="logButton">
               <property name="text">
-               <string>Log</string>
+               <string>Start Logging</string>
               </property>
              </widget>
             </item>
@@ -102,9 +102,16 @@
             <item>
              <layout class="QVBoxLayout" name="descriptionsLayout">
               <item>
-               <widget class="QLabel" name="sensorInfo">
+               <widget class="QLabel" name="runStatusLabel">
                 <property name="text">
-                 <string>sensorInfo</string>
+                 <string>Run Status</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="loggingLabel">
+                <property name="text">
+                 <string>Log Status</string>
                 </property>
                </widget>
               </item>
