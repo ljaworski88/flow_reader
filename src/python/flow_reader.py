@@ -2,7 +2,6 @@
 
 from sf04_sensor.sf04 import *
 from nau7802 import *
-import playsound
 import visa
 from time import sleep, time
 from collections import deque
@@ -17,7 +16,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 import random
 import serial
-# import RPi.GPIO as gpio
+import RPi.GPIO as gpio
 
 class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, lastSettings='global-settings'):
@@ -32,6 +31,16 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.globalSettings = lastSettings
 
         ## Initalize some library resource, state variables, and data arrays for later
+        self.graphUnits = {0 : 'nL/min',
+                           1 : 'Pa',
+                           2 : 'A',
+                           3 : 'V'}
+        gpio.setmode(gpio.BCM)
+        self.doneLED = 9
+        self.errorLED = 11
+        gpio.setup(self.doneLED, gpio.out)
+        gpio.setup(self.errorLED, gpio.out)
+
         self.dataTimer = QtCore.QTimer(self)
         self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
         self.lockTime = 5 * 60 # 5min * 60 sec
@@ -86,7 +95,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lockTimeLineEdit.setValidator(QIntValidator())
 
         self.statusMessage = 'Welcome!'
-        self.dataTimer.timeout.connect(self.UpdateData)
         self.unitsComboBox.addItems(self.flowRates)
         self.unitsComboBox.setCurrentText('nL/min')
         self.flowSetpointUnitsComboBox.addItems(self.flowRates)
@@ -99,15 +107,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         self.lockTimeUnitsComboBox.addItems(['sec', 'min', 'hr'])
         self.lockTimeUnitsComboBox.setCurrentText('min')
-        self.lockTimeUnitsComboBox.currentIndexChanged.connect(self.UpdateLockTime)
         self.lockTimeLineEdit.setText('5')
-        self.lockTimeLineEdit.editingFinished.connect(self.UpdateLockTime)
         self.currentReadingLCD.setSmallDecimalPoint(True)
         self.currentReadingLCD.setNumDigits(9)
 
-        self.runStopButton.clicked.connect(self.SaveGlobalSettings)
-        self.runStopButton.clicked.connect(self.RunStopData)
-        self.logButton.clicked.connect(self.StartStopLogging)
 
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.unitsComboBox.currentText()))
         self.flowGraph.getAxis('bottom').setLabel('Time (sec)')
@@ -136,6 +139,16 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if path.isfile(self.globalSettings):
             self.LoadGlobalSettings(self.globalSettings)
 
+        ## Signal emitters
+        self.dataTimer.timeout.connect(self.UpdateData)
+        self.lockTimeLineEdit.editingFinished.connect(self.UpdateLockTime)
+        self.lockTimeUnitsComboBox.currentIndexChanged.connect(self.UpdateLockTime)
+        self.runStopButton.clicked.connect(self.RunStopData)
+        self.logButton.clicked.connect(self.StartStopLogging)
+        self.graphsTab.currentChanged.connect(self.UpdateGraphUnits)
+
+        ## Save settings Signal emitters
+        self.runStopButton.clicked.connect(self.SaveGlobalSettings)
         self.resolutionSettingSpinBox.valueChanged.connect(self.SaveGlobalSettings)
         self.leftTransducerRadioButton.clicked.connect(self.SaveGlobalSettings)
         self.rightTransducerRadioButton.clicked.connect(self.SaveGlobalSettings)
@@ -386,9 +399,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.setStandardButtons(QMessageBox.Ok)
                     self.msg.show()
                 if self.soundDoneCheckBox.isChecked():
-                    playsound.playsound('done.mp3')
+                    system('vlc done.mp3')
                 if self.ledDoneCheckBox.isChecked():
-                    pass
+                    gpio.output(self.doneLED, gpio.HIGH)
                 self.RunStopData()
                 return
 
@@ -401,6 +414,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                            2 : self.UpdateCurrentGraph,
                            3 : self.UpdateVoltageGraph}
             updateGraph[self.graphsTab.currentIndex()]()
+
+    def UpdateGraphUnits(self):
+        pass
 
     def UpdateFlowGraph(self):
         flowVals = list(self.flowData)[-int(5 * 60 * 1000 / self.timerInterval):]
