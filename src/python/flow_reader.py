@@ -386,7 +386,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.setStandardButtons(QMessageBox.Ok)
                     self.msg.show()
                 if self.soundDoneCheckBox.isChecked():
-                    playsound.playsound('done.wav')
+                    playsound.playsound('done.mp3')
                 if self.ledDoneCheckBox.isChecked():
                     pass
                 self.RunStopData()
