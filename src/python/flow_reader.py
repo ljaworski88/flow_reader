@@ -334,7 +334,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.currentCurve = self.currentGraph.plot()
 
     def AdjustVoltage(self):
-        self.graphUnits[3][1] = self.AdjustVoltage[self.unitsComboBox.currentText()]
+        self.graphUnits[3][1] = self.voltageUnitsDict[self.unitsComboBox.currentText()]
         self.graphUnits[3][0] = self.unitsComboBox.currentText()
         self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
         self.voltageGraph.setYRange(-1/self.graphUnits[3][1], 1/self.graphUnits[3][1])
