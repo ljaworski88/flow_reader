@@ -162,7 +162,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.logButton.clicked.connect(self.StartStopLogging)
         self.graphsTab.currentChanged.connect(self.UpdateGraphUnits)
         self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.UpdateErrorBounds)
-        self.unitsComboBox.currentIndexChanged.connect(self.UpdateAxis)
+        self.unitsComboBox.activated.connect(self.UpdateAxis)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
