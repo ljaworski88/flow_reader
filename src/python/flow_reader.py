@@ -432,7 +432,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def UpdateData(self):
         timepoint = time()
         self.timeData.append(timepoint)
-        flowReading = ReadFlow()
+        flowReading = self.ReadFlow()
 
         # rawLeftTransducerReading = read_load(i2c_bus)
         # rawRightTransducerReading = read_load(i2c_bus2)
