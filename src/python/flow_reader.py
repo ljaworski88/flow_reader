@@ -427,7 +427,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def ReadFlow(self):
         rawFlowReading, _, _ = read_raw_data(self.i2c_bus)
         scaledFlowReading = scale_reading(rawFlowReading, self.scaleFactor)
-        return scaledFlowReading * self.timeUnitsDict['min'] / self.volumeUnitsDict['nL']
+        return scaledFlowReading * self.volumeUnitsDict['nL'] / self.timeUnitsDict['min']
 
     def UpdateData(self):
         timepoint = time()
