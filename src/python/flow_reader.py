@@ -317,7 +317,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.graphUnits[0][0] = self.unitsComboBox.currentText()
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.graphUnits[0][0]))
         self.flowGraph.setYRange((-1/6e8)/self.graphUnits[0][1], (8/6e7)/self.graphUnits[0][1])
-        self.flowCurve = self.flowGraph.plot()
+        self.flowCurve = self.flowGraph.plot(clear)
 
     def AdjustPressure(self):
         self.graphUnits[1][1] = self.pressureUnitsDict[self.unitsComboBox.currentText()]
@@ -505,21 +505,21 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureCurve.setData(timeVals, pressureVals)
         self.currentReadingLCD.display(pressureVals[-1])
 
-    def UpdateVoltageGraph(self):
-        voltageVals = list(self.voltageData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        voltageVals = list(np.divide(voltageVals, self.graphUnits[2][1]))
-        timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        timeVals = list(np.subtract(timeVals, timeVals[-1]))
-        self.voltageCurve.setData(timeVals, voltageVals)
-        self.currentReadingLCD.display(voltageVals[-1])
-
     def UpdateCurrentGraph(self):
         currentVals = list(self.currentData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        currentVals = list(np.divide(currentVals, self.graphUnits[3][1]))
+        currentVals = list(np.divide(currentVals, self.graphUnits[2][1]))
         timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
         timeVals = list(np.subtract(timeVals, timeVals[-1]))
         self.currentCurve.setData(timeVals, currentVals)
         self.currentReadingLCD.display(currentVals[-1])
+
+    def UpdateVoltageGraph(self):
+        voltageVals = list(self.voltageData)[-int(5 * 60 * 1000 / self.timerInterval):]
+        voltageVals = list(np.divide(voltageVals, self.graphUnits[3][1]))
+        timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
+        timeVals = list(np.subtract(timeVals, timeVals[-1]))
+        self.voltageCurve.setData(timeVals, voltageVals)
+        self.currentReadingLCD.display(voltageVals[-1])
 
     def UpdateLockTime(self):
         if self.timeUnitsDict[self.lockTimeUnitsComboBox.currentText()] * int(self.lockTimeLineEdit.text()) < 5 * 60: # don't allow a lock time shorter than 5 minutes
