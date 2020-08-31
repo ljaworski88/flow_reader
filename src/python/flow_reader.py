@@ -129,7 +129,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.graphUnits[0][0]))
         self.flowGraph.getAxis('bottom').setLabel('Time (sec)')
-        self.flowGraph.setYRange(-1/6e8/self.graphUnits[0][1], 8/6e7/self.graphUnits[0][1])
+        self.flowGraph.setYRange((-1/6e8)/self.graphUnits[0][1], (8/6e7)/self.graphUnits[0][1])
         self.flowGraph.showGrid(x=True, y=True)
         self.flowCurve = self.flowGraph.plot()
 
@@ -316,7 +316,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.graphUnits[0][1] = (self.volumeUnitsDict[newUnits[0]]) / (self.timeUnitsDict[newUnits[1]])
         self.graphUnits[0][0] = self.unitsComboBox.currentText()
         self.flowGraph.getAxis('left').setLabel('Flow ({})'.format(self.graphUnits[0][0]))
-        self.flowGraph.setYRange(-1/6e8/self.graphUnits[0][1], 8/6e7/self.graphUnits[0][1])
+        self.flowGraph.setYRange((-1/6e8)/self.graphUnits[0][1], (8/6e7)/self.graphUnits[0][1])
         self.flowCurve = self.flowGraph.plot()
 
     def AdjustPressure(self):
@@ -327,14 +327,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureCurve = self.pressureGraph.plot()
 
     def AdjustCurrent(self):
-        self.graphUnits[2][1] = self.pressureUnitsDict[self.unitsComboBox.currentText()]
+        self.graphUnits[2][1] = self.currentUnitsDict[self.unitsComboBox.currentText()]
         self.graphUnits[2][0] = self.unitsComboBox.currentText()
         self.currentGraph.getAxis('left').setLabel('Current ({})'.format(self.graphUnits[2][0]))
         self.currentGraph.setYRange(-1/self.graphUnits[2][1], 1/self.graphUnits[2][1])
         self.currentCurve = self.currentGraph.plot()
 
     def AdjustVoltage(self):
-        self.graphUnits[3][1] = self.pressureUnitsDict[self.unitsComboBox.currentText()]
+        self.graphUnits[3][1] = self.AdjustVoltage[self.unitsComboBox.currentText()]
         self.graphUnits[3][0] = self.unitsComboBox.currentText()
         self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
         self.voltageGraph.setYRange(-1/self.graphUnits[3][1], 1/self.graphUnits[3][1])
