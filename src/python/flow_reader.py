@@ -473,7 +473,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         pressureDifferentialReading = self.PressureDifferential()
 
-        currentReading, voltageReading, _, _ = self.sourceMeter.query('*READ')
+        instrumentResponse = self.sourceMeter.query(':meas:curr:dc?')
+        currentReading, voltageReading, _, _, _ = instrumentResponse.split(',')
+        currentReading = float(currentReading)
+        voltageReading = float(voltageReading)
         ## End Pi testing
 
         ## Not on Pi Testing
