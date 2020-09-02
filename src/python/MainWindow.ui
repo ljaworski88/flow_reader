@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>776</height>
+    <width>745</width>
+    <height>928</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -39,7 +39,7 @@
              <enum>QTabWidget::North</enum>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="flowGraphTab">
              <attribute name="title">
@@ -706,6 +706,121 @@ color: rgb(238, 238, 236);</string>
        <attribute name="title">
         <string>Calibration</string>
        </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QSplitter" name="splitter_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QLineEdit" name="saveCalibrationLineEdit"/>
+            <widget class="QPushButton" name="saveCalibrationButton">
+             <property name="text">
+              <string>Save Calibration</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <layout class="QFormLayout" name="calibrationTransducerSettingsFormLayout">
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="transducerCalibrationButtonHorizontalLayout">
+              <item>
+               <widget class="QRadioButton" name="leftCalibrationRadioButton">
+                <property name="toolTip">
+                 <string>The LEFT transducer is connected to the high pressure side.</string>
+                </property>
+                <property name="toolTipDuration">
+                 <number>5</number>
+                </property>
+                <property name="text">
+                 <string>Left</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="rightCalibrationRadioButton">
+                <property name="toolTip">
+                 <string>The RIGHT transducer is connected to the high pressure side.</string>
+                </property>
+                <property name="toolTipDuration">
+                 <number>5</number>
+                </property>
+                <property name="text">
+                 <string>Right</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="calibrationTransducerLabel">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="text">
+               <string>Transducer Under Calibration</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLineEdit" name="serialNumberLineEdit"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="serialNumberLabel">
+              <property name="text">
+               <string>Serial Number</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="PlotWidget" name="pressureCalibrationGraph"/>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <widget class="QSplitter" name="splitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QLCDNumber" name="calibrationLCD">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="addCalibrationDataLineEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+          <widget class="QComboBox" name="calibrationUnitsComboBox"/>
+          <widget class="QPushButton" name="addCalibrationDataButton">
+           <property name="text">
+            <string>Add Data</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -716,7 +831,7 @@ color: rgb(238, 238, 236);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>625</width>
+     <width>745</width>
      <height>22</height>
     </rect>
    </property>
