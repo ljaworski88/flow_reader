@@ -398,7 +398,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
             boot_cycle(self.i2c_bus)
             boot_cycle(self.i2c_bus2)
-            reset_sensor(self.self.i2c_bus)
+            reset_sensor(self.i2c_bus)
             self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
             self.sourceMeter.write("*RST")
             sleep(0.5)
