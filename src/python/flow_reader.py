@@ -453,8 +453,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def PressureDifferential(self):
         rawLeftTransducerReading = read_load(self.i2c_bus)
         rawRightTransducerReading = read_load(self.i2c_bus2)
-        leftReading = float(self.leftTransducerSlopeLineEdit) * rawLeftTransducerReading + self.leftTransducerInterceptLineEdit
-        rightReading = float(self.rightTransducerSlopeLineEdit) * rawRightTransducerReading + self.rightTransducerInterceptLineEdit
+        leftReading = float(self.leftTransducerSlopeLineEdit.text()) * rawLeftTransducerReading + float(self.leftTransducerInterceptLineEdit.text())
+        rightReading = float(self.rightTransducerSlopeLineEdit.text()) * rawRightTransducerReading + float(self.rightTransducerInterceptLineEdit.text())
         if self.leftTransducerRadioButton.isChecked():
             return leftReading - rightReading
         else:
