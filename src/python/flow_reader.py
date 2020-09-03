@@ -411,9 +411,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             modelPressures = modelPressures.reshape(-1,1)
             model = LinearRegression().fit(modelPressures, self.calibrationAverages)
             predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
-            adjustedPredictedReadings = list(np.divide(predictedReadings, self.pressureUnitsDict[self.calibrationUnits]))
             self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
-            self.pressurePredictionCurve.setData(displayPressures, adjustedPredictedReadings)
+            self.pressurePredictionCurve.setData(displayPressures, predictedReadings)
 
     def RunStopData(self):
         if self.currentlyRunning:
@@ -658,12 +657,11 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         model = LinearRegression().fit(modelPressures, self.calibrationAverages)
         self.r_sq = model.score(modelPressures, self.calibrationAverages)
         predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
-        adjustedPredictedReadings = list(np.divide(predictedReadings, self.pressureUnitsDict[self.calibrationUnits]))
         intercept = model.intercept_
         slope = float(model.coef_[0]) #Get the slope value as a number, sklearn presents it as a 1d array with one element
         self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
-        self.pressurePredictionCurve.setData(displayPressures, adjustedPredictedReadings)
-        print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, r_sq))
+        self.pressurePredictionCurve.setData(displayPressures, predictedReadings)
+        print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, self.r_sq))
         self.readingToPressureSlope = 1/slope
         self.readingToPressureIntercept = intercept/slope
 
