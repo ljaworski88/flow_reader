@@ -258,6 +258,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.popUpDoneCheckBox.setChecked(loadedSettings['Experiment']['Done Pop-Up'])
             self.loadExperimentSettingsLineEdit.setText(loadedSettings['Experiment']['Save'])
 
+            if self.errorBoundsUnitsComboBox.currentText() == '%':
+                self.errorBoundsUnitsComboBox.clear()
+                self.errorBoundsUnitsComboBox.addItem('%')
+                self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
+                self.errorBoundsUnitsComboBox.setCurrentText('%')
+
     def SaveGlobalSettings(self):
         sensorSettings = self.SaveSensorSettings(0xDEADBEEF)
         exmperimentSettings = self.SaveExperimentSettings(0xDEADBEEF)
