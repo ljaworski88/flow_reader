@@ -405,14 +405,15 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.calibrationUnits = self.calibrationUnitsComboBox.currentText()
         self.pressureCalibrationGraph.getAxis('left').setLabel('Pressure ({})'.format(self.calibrationUnits))
 
-        displayPressures = list(np.divide(self.calibrationPressures, self.pressureUnitsDict[self.calibrationUnits]))
-        modelPressures = np.array(self.calibrationPressures).reshape(-1,1)
-        modelPressures = modelPressures.reshape(-1,1)
-        model = LinearRegression().fit(modelPressures, self.calibrationAverages)
-        predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
-        adjustedPredictedReadings = list(np.divide(predictedReadings, self.pressureUnitsDict[self.calibrationUnits]))
-        self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
-        self.pressurePredictionCurve.setData(displayPressures, adjustedPredictedReadings)
+        if self.calibrationPressures:
+            displayPressures = list(np.divide(self.calibrationPressures, self.pressureUnitsDict[self.calibrationUnits]))
+            modelPressures = np.array(self.calibrationPressures).reshape(-1,1)
+            modelPressures = modelPressures.reshape(-1,1)
+            model = LinearRegression().fit(modelPressures, self.calibrationAverages)
+            predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
+            adjustedPredictedReadings = list(np.divide(predictedReadings, self.pressureUnitsDict[self.calibrationUnits]))
+            self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
+            self.pressurePredictionCurve.setData(displayPressures, adjustedPredictedReadings)
 
     def RunStopData(self):
         if self.currentlyRunning:
