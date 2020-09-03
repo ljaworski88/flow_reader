@@ -230,17 +230,17 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
             self.resolutionSettingSpinBox.setValue(loadedSettings['Sensor']['Flow Meter'])
 
-            self.transducer2RadioButton.setChecked(loadedSettings['Sensor']['Pressure Transducer']['High Side-Left'])
-            self.transducer2SlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Slope'])
-            self.transducer2InterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Intercept'])
-            self.transducer2SerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Serial'])
-            self.transducer2UnitComboBox.setCurrentText(loadedSettings['Sensor']['Pressure Transducer']['Left']['Units'])
+            self.transducer2RadioButton.setChecked(loadedSettings['Sensor']['Pressure Transducer']['High Side-Transducer2'])
+            self.transducer2SlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Transducer2']['Slope'])
+            self.transducer2InterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Transducer2']['Intercept'])
+            self.transducer2SerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Transducer2']['Serial'])
+            self.transducer2UnitComboBox.setCurrentText(loadedSettings['Sensor']['Pressure Transducer']['Transducer2']['Units'])
 
-            self.transducer1RadioButton.setChecked(loadedSettings['Sensor']['Pressure Transducer']['High Side-Right'])
-            self.transducer1SlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Slope'])
-            self.transducer1InterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Intercept'])
-            self.transducer1SerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Serial'])
-            self.transducer1UnitComboBox.setCurrentText(loadedSettings['Sensor']['Pressure Transducer']['Right']['Units'])
+            self.transducer1RadioButton.setChecked(loadedSettings['Sensor']['Pressure Transducer']['High Side-Transducer1'])
+            self.transducer1SlopeLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Transducer1']['Slope'])
+            self.transducer1InterceptLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Transducer1']['Intercept'])
+            self.transducer1SerialLineEdit.setText(loadedSettings['Sensor']['Pressure Transducer']['Transducer1']['Serial'])
+            self.transducer1UnitComboBox.setCurrentText(loadedSettings['Sensor']['Pressure Transducer']['Transducer1']['Units'])
 
             self.saveResultsNameLineEdit.setText(loadedSettings['Experiment']['Results Save'])
             self.crossSectionLineEdit.setText(loadedSettings['Experiment']['Cross Section'])
@@ -278,13 +278,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def SaveSensorSettings(self, fileName=None):
         saveData = {'Flow Meter' : self.resolutionSettingSpinBox.value(),
-                    'Pressure Transducer' : {'High Side-Left' : self.transducer2RadioButton.isChecked(),
-                                             'High Side-Right' : self.transducer1RadioButton.isChecked(),
-                                             'Left' : {'Slope' : self.transducer2SlopeLineEdit.text(),
+                    'Pressure Transducer' : {'High Side-Transducer2' : self.transducer2RadioButton.isChecked(),
+                                             'High Side-Transducer1' : self.transducer1RadioButton.isChecked(),
+                                             'Transducer2' : {'Slope' : self.transducer2SlopeLineEdit.text(),
                                                        'Intercept' : self.transducer2InterceptLineEdit.text(),
                                                        'Units' : self.transducer2UnitComboBox.currentText(),
                                                        'Serial' : self.transducer2SerialLineEdit.text()},
-                                             'Right' : {'Slope' : self.transducer1SlopeLineEdit.text(),
+                                             'Transducer1' : {'Slope' : self.transducer1SlopeLineEdit.text(),
                                                        'Intercept' : self.transducer1InterceptLineEdit.text(),
                                                        'Units' : self.transducer1UnitComboBox.currentText(),
                                                        'Serial' : self.transducer1SerialLineEdit.text()}},
@@ -503,12 +503,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def PressureDifferential(self):
         rawTransducer2Reading = read_load(self.i2c_bus)
         rawTransducer1Reading = read_load(self.i2c_bus2)
-        leftReading = float(self.transducer2SlopeLineEdit.text()) * rawTransducer2Reading + float(self.transducer2InterceptLineEdit.text())
-        rightReading = float(self.transducer1SlopeLineEdit.text()) * rawTransducer1Reading + float(self.transducer1InterceptLineEdit.text())
+        transducer2Reading = float(self.transducer2SlopeLineEdit.text()) * rawTransducer2Reading + float(self.transducer2InterceptLineEdit.text())
+        transducer1Reading = float(self.transducer1SlopeLineEdit.text()) * rawTransducer1Reading + float(self.transducer1InterceptLineEdit.text())
         if self.transducer2RadioButton.isChecked():
-            return leftReading - rightReading
+            return transducer2Reading - transducer1Reading
         else:
-            return rightReading - leftReading
+            return transducer1Reading - transducer2Reading
 
     def ReadFlow(self):
         rawFlowReading, _, _ = read_raw_data(self.i2c_bus)
@@ -624,7 +624,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def AddCalibrationPoint(self):
         ## Pi-start
-        if self.leftCalibrationRadioButton.isChecked():
+        if self.transducer1CalibrationRadioButton.isChecked():
             bus = self.i2c_bus
         else:
             bus = self.i2c_bus2
