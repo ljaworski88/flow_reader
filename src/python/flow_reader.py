@@ -403,7 +403,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureCalibrationCurve.clear()
         self.pressurePredictionCurve.clear()
         self.calibrationUnits = self.calibrationUnitsComboBox.currentText()
-        self.pressureCalibrationGraph.getAxis('left').setLabel('Pressure ({})'.format(self.calibrationUnits))
+        self.pressureCalibrationGraph.getAxis('bottom').setLabel('Pressure ({})'.format(self.calibrationUnits))
 
         if self.calibrationPressures:
             displayPressures = list(np.divide(self.calibrationPressures, self.pressureUnitsDict[self.calibrationUnits]))
