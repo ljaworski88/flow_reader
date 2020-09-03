@@ -426,6 +426,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.runStopButton.setText('Run')
             self.runStatusLabel.setText('Stopped')
         else:
+            gpio.output(self.doneLED, gpio.LOW)
             self.dataTimer.start(self.timerInterval)
             self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
@@ -625,9 +626,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def AddCalibrationPoint(self):
         ## Pi-start
         if self.transducer1CalibrationRadioButton.isChecked():
-            bus = self.i2c_bus
-        else:
             bus = self.i2c_bus2
+        else:
+            bus = self.i2c_bus
 
         readings = []
         boot_cycle(bus)
@@ -638,10 +639,17 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         set_gain(bus, 'x1')
         start_reading_data(bus, start=True)
         sleep(0.1)
+        gpio.output(self.doneLED, gpio.LOW)
         for x in range(100):
             while not checkDataReady(bus):
+                if gpio.input(self.errorLED):
+                    gpio.output(self.errorLED, gpio.LOW)
+                else:
+                    gpio.output(self.errorLED, gpio.HIGH)
                 sleep(0.025)
             readings.append(read_load(bus))
+        gpio.output(self.errorLED, gpio.LOW)
+        gpio.output(self.doneLED, gpio.HIGH)
         ## Pi-end
         ## not-Pi-start
         # readings = []

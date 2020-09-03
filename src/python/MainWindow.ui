@@ -289,11 +289,11 @@ color: rgb(238, 238, 236);</string>
         <item>
          <widget class="QTabWidget" name="transducerSettingsTab">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="transducer1SettingsTab">
            <attribute name="title">
-            <string>Right Transducer</string>
+            <string>Transducer 1</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
@@ -384,7 +384,7 @@ color: rgb(238, 238, 236);</string>
           </widget>
           <widget class="QWidget" name="transducer2SettingsTab">
            <attribute name="title">
-            <string>Left Transducer</string>
+            <string>Transducer 2</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>

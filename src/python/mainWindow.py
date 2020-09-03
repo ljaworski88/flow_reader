@@ -483,7 +483,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.mainTabStack.setCurrentIndex(1)
         self.graphsTab.setCurrentIndex(1)
-        self.transducerSettingsTab.setCurrentIndex(0)
+        self.transducerSettingsTab.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -517,7 +517,7 @@ class Ui_MainWindow(object):
         self.transducer1SerialLineEdit.setToolTip(_translate("MainWindow", "Right transducer serial number"))
         self.transducer1SerialLabel.setText(_translate("MainWindow", "Serial Number"))
         self.loadTransducer1SettingsButton.setText(_translate("MainWindow", "Load Cal File"))
-        self.transducerSettingsTab.setTabText(self.transducerSettingsTab.indexOf(self.transducer1SettingsTab), _translate("MainWindow", "Right Transducer"))
+        self.transducerSettingsTab.setTabText(self.transducerSettingsTab.indexOf(self.transducer1SettingsTab), _translate("MainWindow", "Transducer 1"))
         self.transducer2SlopeLineEdit.setToolTip(_translate("MainWindow", "Slope of left transducer in [pressure units]/mV"))
         self.transducer2SlopeLabel.setText(_translate("MainWindow", "Slope"))
         self.transducer2InterceptLineEdit.setToolTip(_translate("MainWindow", "Intercept of left transducer in mV"))
@@ -526,7 +526,7 @@ class Ui_MainWindow(object):
         self.transducer2SerialLineEdit.setToolTip(_translate("MainWindow", "Left transducer serial number"))
         self.transducer2SerialLabel.setText(_translate("MainWindow", "Serial Number"))
         self.loadTransducer2SettingsButton.setText(_translate("MainWindow", "Load Cal File"))
-        self.transducerSettingsTab.setTabText(self.transducerSettingsTab.indexOf(self.transducer2SettingsTab), _translate("MainWindow", "Left Transducer"))
+        self.transducerSettingsTab.setTabText(self.transducerSettingsTab.indexOf(self.transducer2SettingsTab), _translate("MainWindow", "Transducer 2"))
         self.loadFlowReaderSettingsButton.setText(_translate("MainWindow", "Load Settings"))
         self.saveSensorSettingsButton.setText(_translate("MainWindow", "Save Settings"))
         self.mainTabStack.setTabText(self.mainTabStack.indexOf(self.sensorSettingsTab), _translate("MainWindow", "Sensor Settings"))
