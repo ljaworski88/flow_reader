@@ -250,19 +250,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.flowSetpointUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Setpoint Units'])
             self.averagingDepthSpinBox.setValue(loadedSettings['Experiment']['Averaging Depth'])
             self.errorBoundsLineEdit.setText(loadedSettings['Experiment']['Flow Error Bounds'])
-            self.errorBoundsUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Error Units'])
+            if loadedSettings['Experiment']['Flow Error Units'] == '%':
+                self.errorBoundsUnitsComboBox.clear()
+                self.errorBoundsUnitsComboBox.addItem('%')
+                self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
+                self.errorBoundsUnitsComboBox.setCurrentText('%')
+            else:
+                self.errorBoundsUnitsComboBox.clear()
+                self.errorBoundsUnitsComboBox.addItem('%')
+                self.errorBoundsUnitsComboBox.addItem(loadedSettings['Experiment']['Flow Error Units'])
+                self.errorBoundsUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Error Units'])
             self.lockTimeLineEdit.setText(loadedSettings['Experiment']['Lock Time'])
             self.lockTimeUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Lock Time Units'])
             self.soundDoneCheckBox.setChecked(loadedSettings['Experiment']['Done Sound'])
             self.ledDoneCheckBox.setChecked(loadedSettings['Experiment']['Done LED'])
             self.popUpDoneCheckBox.setChecked(loadedSettings['Experiment']['Done Pop-Up'])
             self.loadExperimentSettingsLineEdit.setText(loadedSettings['Experiment']['Save'])
-
-            if self.errorBoundsUnitsComboBox.currentText() == '%':
-                self.errorBoundsUnitsComboBox.clear()
-                self.errorBoundsUnitsComboBox.addItem('%')
-                self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
-                self.errorBoundsUnitsComboBox.setCurrentText('%')
 
     def SaveGlobalSettings(self):
         sensorSettings = self.SaveSensorSettings(0xDEADBEEF)
