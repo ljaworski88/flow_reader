@@ -345,7 +345,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             oldVolumeUnit, oldTimeUnit = currentUnits.split('/')
             newVolumeUnit, newTimeUnit = self.flowSetpointUnitsComboBox.currentText().split('/')
             newErrorBound = float(self.errorBoundsLineEdit.text()) * self.timeUnitsDict[oldTimeUnit] / self.volumeUnitsDict[oldVolumeUnit] * self.volumeUnitsDict[newVolumeUnit] / self.timeUnitsDict[newTimeUnit]
-            self.errorBoundsLineEdit.setText(str(newErrorBound))
+            self.errorBoundsLineEdit.setText(str(int(newErrorBound)))
 
     def UpdateAxis(self):
         axisScale = {0 : self.AdjustFlow,
