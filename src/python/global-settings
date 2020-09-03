@@ -1,33 +1,33 @@
 Experiment:
-  Averaging Depth: 6
-  Cross Section: '1000'
+  Averaging Depth: 1
+  Cross Section: '100'
   Cross Section Units: mm^2
-  Done LED: false
+  Done LED: true
   Done Pop-Up: true
   Done Sound: true
-  Flow Error Bounds: '1'
-  Flow Error Units: '%'
-  Flow Setpoint: '500'
-  Flow Setpoint Units: nL/min
+  Flow Error Bounds: '0.001'
+  Flow Error Units: mL/hr
+  Flow Setpoint: '0.1'
+  Flow Setpoint Units: mL/hr
   Lock Time: '5'
   Lock Time Units: min
-  Results Save: results.csv
+  Results Save: result.csv
   Save: ''
-  Tissue Thickness: '12'
+  Tissue Thickness: '1'
   Tissue Thickness Units: mm
 Sensor:
   Flow Meter: 16
   Pressure Transducer:
-    High Side-Left: true
-    High Side-Right: false
-    Left:
-      Intercept: '4'
+    High Side-Transducer1: false
+    High Side-Transducer2: true
+    Transducer1:
+      Intercept: ''
       Serial: ''
-      Slope: '5'
+      Slope: ''
       Units: Pa
-    Right:
-      Intercept: '4'
+    Transducer2:
+      Intercept: ''
       Serial: ''
-      Slope: '5'
+      Slope: ''
       Units: Pa
   Save: ''
