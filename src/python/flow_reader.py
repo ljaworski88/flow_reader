@@ -189,6 +189,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.graphsTab.currentChanged.connect(self.UpdateGraphUnits)
         self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.UpdateErrorBounds)
         self.unitsComboBox.activated.connect(self.UpdateAxis)
+        self.calibrationUnitsComboBox.currentIndexChanged.connect(self.AdjustCalibration)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
@@ -396,6 +397,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.upperBound = (100 + float(self.errorBoundsLineEdit.text())) / 100 * float(self.flowSetpointLineEdit.text())
         self.lowerBound = float(self.flowSetpointLineEdit.text()) - float(self.errorBoundsLineEdit.text())
         self.upperBound = float(self.flowSetpointLineEdit.text()) + float(self.errorBoundsLineEdit.text())
+
+    #TODO Fix this
+    def AdjustCalibration(self):
+        self.pressureCalibrationCurve.clear()
+        self.pressurePredictionCurve.clear()
+        self.calibrationUnits = self.calibrationUnitsComboBox.currentText()
+        self.pressureCalibrationGraph.getAxis('left').setLabel('Pressure ({})'.format(self.calibrationUnits))
+
+        displayPressures = list(np.divide(self.calibrationPressures, self.pressureUnitsDict[self.calibrationUnits]))
+        modelPressures = np.array(self.calibrationPressures).reshape(-1,1)
+        modelPressures = modelPressures.reshape(-1,1)
+        model = LinearRegression().fit(modelPressures, self.calibrationAverages)
+        predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
+        adjustedPredictedReadings = list(np.divide(predictedReadings, self.pressureUnitsDict[self.calibrationUnits]))
+        self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
+        self.pressurePredictionCurve.setData(displayPressures, adjustedPredictedReadings)
 
     def RunStopData(self):
         if self.currentlyRunning:
@@ -640,10 +657,11 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         model = LinearRegression().fit(modelPressures, self.calibrationAverages)
         self.r_sq = model.score(modelPressures, self.calibrationAverages)
         predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
+        adjustedPredictedReadings = list(np.divide(predictedReadings, self.pressureUnitsDict[self.calibrationUnits]))
         intercept = model.intercept_
         slope = float(model.coef_[0]) #Get the slope value as a number, sklearn presents it as a 1d array with one element
-        self.pressureCalibrationCurve.setData(self.calibrationPressures, self.calibrationAverages)
-        self.pressurePredictionCurve.setData(self.calibrationPressures, predictedReadings)
+        self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
+        self.pressurePredictionCurve.setData(displayPressures, adjustedPredictedReadings)
         print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, r_sq))
         self.readingToPressureSlope = 1/slope
         self.readingToPressureIntercept = intercept/slope
