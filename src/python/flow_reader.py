@@ -6,19 +6,22 @@ import visa
 from time import sleep, time
 from collections import deque
 from statistics import mean
-from os import system, path, remove
+from os import path
+from subprocess import Popen
 import sys
 import yaml
 from mainWindow import Ui_MainWindow
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 import pyqtgraph
 import random
 import serial
+## Pi-start
 import RPi.GPIO as gpio
+## Pi-end
 
 class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, lastSettings='global-settings'):
@@ -38,6 +41,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                            2 : ['A', 1],
                            3 : ['V', 1]}
         self.calibrationUnits = 'Pa'
+        self.r_sq = None
+        self.readingToPressureSlope = None
+        self.readingToPressureIntercept = None
         ## Pi-start
         gpio.setmode(gpio.BCM)
         self.doneLED = 9
@@ -322,7 +328,18 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         pass
 
     def UpdateErrorBounds(self):
-        pass
+        currentUnits = self.errorBoundsUnitsComboBox.currentText()
+        self.errorBoundsUnitsComboBox.clear()
+        self.errorBoundsUnitsComboBox.addItem('%')
+        self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
+        if currentUnits == '%':
+            self.errorBoundsUnitsComboBox.setCurrentText('%')
+        else:
+            self.errorBoundsUnitsComboBox.setCurrentText(self.flowSetpointUnitsComboBox.currentText())
+            oldVolumeUnit, oldTimeUnit = currentUnits.split('/')
+            newVolumeUnit, newTimeUnit = self.flowSetpointUnitsComboBox.currentText().split('/')
+            newErrorBound = float(self.errorBoundsLineEdit.text()) * self.timeUnitsDict[oldTimeUnit] / self.volumeUnitsDict[oldVolumeUnit] * self.volumeUnitsDict[newVolumeUnit] / self.timeUnitsDict[newTimeUnit]
+            self.errorBoundsLineEdit.setText(newErrorBound)
 
     def UpdateAxis(self):
         axisScale = {0 : self.AdjustFlow,
@@ -377,7 +394,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             if self.logData:
                 self.StartStopLogging()
             self.dataTimer.stop()
+            ## Pi-start
             self.sourceMeter.close()
+            ## Pi-end
             self.runStopButton.setText('Run')
             self.runStatusLabel.setText('Stopped')
         else:
@@ -396,15 +415,18 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
             ## Reset the pressure and flow chips on the I2C buses
 
+            ## Pi-start
             boot_cycle(self.i2c_bus)
             boot_cycle(self.i2c_bus2)
             reset_sensor(self.i2c_bus)
             self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
             self.sourceMeter.write("*RST")
             sleep(0.5)
+            ## Pi-end
 
             # Set up the pressure sensors
 
+            ## Pi-start
             set_avdd_voltage(self.i2c_bus, '4.5v')
             select_avdd_source(self.i2c_bus, internal_source=True)
             set_conversion_rate(self.i2c_bus, conversion_rate='sps10')
@@ -415,17 +437,19 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             set_conversion_rate(self.i2c_bus2, conversion_rate='sps10')
             set_gain(self.i2c_bus2, 'x1')
             start_reading_data(self.i2c_bus2, start=True)
+            ## Pi-end
 
             # Set up the flow sensor
 
+            ## Pi-start
             self.sensor, self.serialNumber, _, _ = read_product_info(self.i2c_bus)
             self.scaleFactor, self.units, _, _ = read_scale_and_unit(self.i2c_bus)
             set_resolution(self.i2c_bus, bits=self.resolutionSettingSpinBox.value())
             set_read_data(self.i2c_bus)
+            ## Pi-end
 
             # Set up the sourcemeter for voltage and current
 
-            # self.sourceMeter.write(":measure:resistance?")
             self.runStatusLabel.setText('Running')
             self.runStopButton.setText('Stop')
 
@@ -468,7 +492,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def UpdateData(self):
         timepoint = time()
         self.timeData.append(timepoint)
-        ## Pi Testing
+        ## Pi-start
         flowReading = self.ReadFlow()
 
         pressureDifferentialReading = self.PressureDifferential()
@@ -477,14 +501,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         currentReading, voltageReading, _, _, _ = instrumentResponse.split(',')
         currentReading = float(currentReading)
         voltageReading = float(voltageReading)
-        ## End Pi testing
+        ## Pi-end
 
-        ## Not on Pi Testing
+        ## not-Pi-start
         # flowReading = random.randrange(3000, 3500)*1e-9/60
         # pressureDifferentialReading = random.randrange(100000, 200000)
         # voltageReading = random.randrange(-100, 101)/1e3
         # currentReading = random.randrange(-100, 101)/1e3
-        ## End Not Pi
+        ## not-Pi-end
         if self.logData:
             with open(self.logFileLineEdit.text(), 'a') as data:
                 data.write('{},{},{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading, currentReading, voltageReading))
@@ -503,9 +527,11 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.msg.setStandardButtons(QMessageBox.Ok)
                     self.msg.show()
                 if self.soundDoneCheckBox.isChecked():
-                    system('vlc done.mp3')
+                    Popen(['vlc', 'done.mp3'])
                 if self.ledDoneCheckBox.isChecked():
+                    ## Pi-start
                     gpio.output(self.doneLED, gpio.HIGH)
+                    ## Pi-end
                 self.RunStopData()
                 if self.logData:
                     self.StartStopLogging()
@@ -571,6 +597,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.lockTime = self.timeUnitsDict[self.lockTimeUnitsComboBox.currentText()] * int(self.lockTimeLineEdit.text())
 
     def AddCalibrationPoint(self):
+        ## Pi-start
         if self.leftCalibrationRadioButton.isChecked():
             bus = self.i2c_bus
         else:
@@ -589,9 +616,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             while not checkDataReady(bus):
                 sleep(0.025)
             readings.append(read_load(bus))
+        ## Pi-end
+        ## not-Pi-start
         # readings = []
         # for x in range(100):
             # readings.append(random.randrange(3000, 3500))
+        ## not-Pi-end
         self.calibrationAverages.append(mean(readings))
         self.calibrationLCD.display(self.calibrationAverages[-1])
         self.calibrationPressures.append(float(self.addCalibrationDataLineEdit.text()) * self.pressureUnitsDict[self.calibrationUnits])
@@ -599,13 +629,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         modelPressures = np.array(self.calibrationPressures).reshape(-1,1)
         modelPressures = modelPressures.reshape(-1,1)
         model = LinearRegression().fit(modelPressures, self.calibrationAverages)
-        r_sq = model.score(modelPressures, self.calibrationAverages)
+        self.r_sq = model.score(modelPressures, self.calibrationAverages)
         predictedReadings = model.predict(modelPressures) #gives predicted y vals for array x
         intercept = model.intercept_
         slope = float(model.coef_[0]) #Get the slope value as a number, sklearn presents it as a 1d array with one element
         self.pressureCalibrationCurve.setData(self.calibrationPressures, self.calibrationAverages)
         self.pressurePredictionCurve.setData(self.calibrationPressures, predictedReadings)
         print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, r_sq))
+        self.readingToPressureSlope = 1/slope
+        self.readingToPressureIntercept = intercept/slope
+
+    def SaveCalibrationData(self):
+        if not self.saveCalibrationLineEdit.text():
+            dialog = QFileDialog(self)
+            dialog.setFileMode(QFileDialog.AnyFile)
+        else:
+            saveFileLocation = self.saveCalibrationLineEdit.text()
 
 def main():
     app = QApplication(sys.argv)
