@@ -662,7 +662,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
         self.pressurePredictionCurve.setData(displayPressures, predictedReadings)
         print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, self.r_sq))
-        self.readingToPressureSlope = 1/slope
+        if slope == float(0):
+            self.readingToPressureSlope = 0.0
+        else:
+            self.readingToPressureSlope = 1/slope
         self.readingToPressureIntercept = intercept/slope
 
     def SaveCalibrationData(self):
