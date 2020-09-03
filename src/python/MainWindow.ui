@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -239,23 +239,7 @@ color: rgb(238, 238, 236);</string>
             <item row="0" column="0">
              <layout class="QHBoxLayout" name="transducerHighSideButtonHorizontalLayout">
               <item>
-               <widget class="QRadioButton" name="leftTransducerRadioButton">
-                <property name="toolTip">
-                 <string>The LEFT transducer is connected to the high pressure side.</string>
-                </property>
-                <property name="toolTipDuration">
-                 <number>5</number>
-                </property>
-                <property name="text">
-                 <string>Left</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="rightTransducerRadioButton">
+               <widget class="QRadioButton" name="transducer1RadioButton">
                 <property name="toolTip">
                  <string>The RIGHT transducer is connected to the high pressure side.</string>
                 </property>
@@ -263,7 +247,23 @@ color: rgb(238, 238, 236);</string>
                  <number>5</number>
                 </property>
                 <property name="text">
-                 <string>Right</string>
+                 <string>Transducer 1</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="transducer2RadioButton">
+                <property name="toolTip">
+                 <string>The LEFT transducer is connected to the high pressure side.</string>
+                </property>
+                <property name="toolTipDuration">
+                 <number>5</number>
+                </property>
+                <property name="text">
+                 <string>Transducer 2</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -289,109 +289,21 @@ color: rgb(238, 238, 236);</string>
         <item>
          <widget class="QTabWidget" name="transducerSettingsTab">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
-          <widget class="QWidget" name="leftTransducerSettingsTab">
-           <attribute name="title">
-            <string>Left Transducer</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <layout class="QVBoxLayout" name="leftTransducerSettingsVeritcalLayout">
-              <item>
-               <layout class="QHBoxLayout" name="leftTransducerCalibrationHorizontalLayout">
-                <item>
-                 <layout class="QFormLayout" name="leftTransducerCalibrationFormLayout">
-                  <item row="0" column="0">
-                   <widget class="QLineEdit" name="leftTransducerSlopeLineEdit">
-                    <property name="toolTip">
-                     <string>Slope of left transducer in [pressure units]/mV</string>
-                    </property>
-                    <property name="toolTipDuration">
-                     <number>5</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="leftTransducerSlopeLabel">
-                    <property name="text">
-                     <string>Slope</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLineEdit" name="leftTransducerInterceptLineEdit">
-                    <property name="toolTip">
-                     <string>Intercept of left transducer in mV</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="leftTransducerInerceptLabel">
-                    <property name="text">
-                     <string>Intercept</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QFormLayout" name="leftTransducerIDFormLayout">
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="leftTransducerPressureUnitsLabel">
-                    <property name="text">
-                     <string>Pressure Units</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLineEdit" name="leftTransducerSerialLineEdit">
-                    <property name="toolTip">
-                     <string>Left transducer serial number</string>
-                    </property>
-                    <property name="toolTipDuration">
-                     <number>5</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="leftTransducerSerialLabel">
-                    <property name="text">
-                     <string>Serial Number</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QComboBox" name="leftTransducerUnitComboBox"/>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QPushButton" name="loadLeftTransducerSettingsButton">
-                <property name="text">
-                 <string>Load Cal File</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="rightTransducerSettingsTab">
+          <widget class="QWidget" name="transducer1SettingsTab">
            <attribute name="title">
             <string>Right Transducer</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <layout class="QVBoxLayout" name="rightTransducerSettingsVerticalLayout">
+             <layout class="QVBoxLayout" name="transducer1SettingsVerticalLayout">
               <item>
-               <layout class="QHBoxLayout" name="rightTransducerCalibrationHorizontalLayout">
+               <layout class="QHBoxLayout" name="transducer1CalibrationHorizontalLayout">
                 <item>
-                 <layout class="QFormLayout" name="rightTransducerCalibrationFormLayout">
+                 <layout class="QFormLayout" name="transducer1CalibrationFormLayout">
                   <item row="0" column="0">
-                   <widget class="QLineEdit" name="rightTransducerSlopeLineEdit">
+                   <widget class="QLineEdit" name="transducer1SlopeLineEdit">
                     <property name="toolTip">
                      <string>Slope of right transducer in Pa/mV</string>
                     </property>
@@ -401,14 +313,14 @@ color: rgb(238, 238, 236);</string>
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QLabel" name="rightTransducerSlopeLabel">
+                   <widget class="QLabel" name="transducer1SlopeLabel">
                     <property name="text">
                      <string>Slope</string>
                     </property>
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="QLineEdit" name="rightTransducerInterceptLineEdit">
+                   <widget class="QLineEdit" name="transducer1InterceptLineEdit">
                     <property name="toolTip">
                      <string>Intercept of left transducer in mV</string>
                     </property>
@@ -418,7 +330,7 @@ color: rgb(238, 238, 236);</string>
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QLabel" name="rightTransducerInerceptLabel">
+                   <widget class="QLabel" name="transducer1InerceptLabel">
                     <property name="text">
                      <string>Intercept</string>
                     </property>
@@ -427,16 +339,16 @@ color: rgb(238, 238, 236);</string>
                  </layout>
                 </item>
                 <item>
-                 <layout class="QFormLayout" name="rightTransducerIDFormLayout">
+                 <layout class="QFormLayout" name="transducer1IDFormLayout">
                   <item row="0" column="1">
-                   <widget class="QLabel" name="rightTransducerPressureUnitsLabel">
+                   <widget class="QLabel" name="transducer1PressureUnitsLabel">
                     <property name="text">
                      <string>Pressure Units</string>
                     </property>
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="QLineEdit" name="rightTransducerSerialLineEdit">
+                   <widget class="QLineEdit" name="transducer1SerialLineEdit">
                     <property name="toolTip">
                      <string>Right transducer serial number</string>
                     </property>
@@ -446,21 +358,109 @@ color: rgb(238, 238, 236);</string>
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QLabel" name="rightTransducerSerialLabel">
+                   <widget class="QLabel" name="transducer1SerialLabel">
                     <property name="text">
                      <string>Serial Number</string>
                     </property>
                    </widget>
                   </item>
                   <item row="0" column="0">
-                   <widget class="QComboBox" name="rightTransducerUnitComboBox"/>
+                   <widget class="QComboBox" name="transducer1UnitComboBox"/>
                   </item>
                  </layout>
                 </item>
                </layout>
               </item>
               <item>
-               <widget class="QPushButton" name="loadRightTransducerSettingsButton">
+               <widget class="QPushButton" name="loadTransducer1SettingsButton">
+                <property name="text">
+                 <string>Load Cal File</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="transducer2SettingsTab">
+           <attribute name="title">
+            <string>Left Transducer</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <layout class="QVBoxLayout" name="transducer2SettingsVeritcalLayout">
+              <item>
+               <layout class="QHBoxLayout" name="transducer2CalibrationHorizontalLayout">
+                <item>
+                 <layout class="QFormLayout" name="transducer2CalibrationFormLayout">
+                  <item row="0" column="0">
+                   <widget class="QLineEdit" name="transducer2SlopeLineEdit">
+                    <property name="toolTip">
+                     <string>Slope of left transducer in [pressure units]/mV</string>
+                    </property>
+                    <property name="toolTipDuration">
+                     <number>5</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="transducer2SlopeLabel">
+                    <property name="text">
+                     <string>Slope</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLineEdit" name="transducer2InterceptLineEdit">
+                    <property name="toolTip">
+                     <string>Intercept of left transducer in mV</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="transducer2InerceptLabel">
+                    <property name="text">
+                     <string>Intercept</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QFormLayout" name="transducer2IDFormLayout">
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="transducer2PressureUnitsLabel">
+                    <property name="text">
+                     <string>Pressure Units</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLineEdit" name="transducer2SerialLineEdit">
+                    <property name="toolTip">
+                     <string>Left transducer serial number</string>
+                    </property>
+                    <property name="toolTipDuration">
+                     <number>5</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="transducer2SerialLabel">
+                    <property name="text">
+                     <string>Serial Number</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QComboBox" name="transducer2UnitComboBox"/>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QPushButton" name="loadTransducer2SettingsButton">
                 <property name="text">
                  <string>Load Cal File</string>
                 </property>
@@ -727,23 +727,7 @@ color: rgb(238, 238, 236);</string>
             <item row="0" column="0">
              <layout class="QHBoxLayout" name="transducerCalibrationButtonHorizontalLayout">
               <item>
-               <widget class="QRadioButton" name="leftCalibrationRadioButton">
-                <property name="toolTip">
-                 <string>The LEFT transducer is connected to the high pressure side.</string>
-                </property>
-                <property name="toolTipDuration">
-                 <number>5</number>
-                </property>
-                <property name="text">
-                 <string>Left</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="rightCalibrationRadioButton">
+               <widget class="QRadioButton" name="transducer1CalibrationRadioButton">
                 <property name="toolTip">
                  <string>The RIGHT transducer is connected to the high pressure side.</string>
                 </property>
@@ -751,7 +735,23 @@ color: rgb(238, 238, 236);</string>
                  <number>5</number>
                 </property>
                 <property name="text">
-                 <string>Right</string>
+                 <string>Transducer 1</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="transducer2CalibrationRadioButton">
+                <property name="toolTip">
+                 <string>The LEFT transducer is connected to the high pressure side.</string>
+                </property>
+                <property name="toolTipDuration">
+                 <number>5</number>
+                </property>
+                <property name="text">
+                 <string>Transducer 2</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
