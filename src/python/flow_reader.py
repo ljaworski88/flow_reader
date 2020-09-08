@@ -691,10 +691,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             saveFileLocation = QFileDialog.getSaveFileName(self)
         else:
             saveFileLocation = self.saveCalibrationLineEdit.text()
-        saveData = {'slope' : self.readingToPressureSlope,
-                    'intercept' : self.readingToPressureIntercept,
+        saveData = {'slope'     : float(self.readingToPressureSlope),
+                    'intercept' : float(self.readingToPressureIntercept),
                     'serial'    : self.serialNumberLineEdit.text(),
-                    'r_sq'      : self.r_sq}
+                    'r_sq'      : float(self.r_sq)}
         with zipfile.ZipFile(saveFileLocation, mode='w') as calFile:
             with calFile.open('sensor_parameters.yaml', 'w') as parameters:
                 parameters.write(bytes(yaml.dump(saveData), 'utf-8'))
