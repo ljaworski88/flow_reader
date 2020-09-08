@@ -340,14 +340,19 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def LoadCalibrationTransducer1(self):
         saveFileLocation = QFileDialog.getOpenFileName(self, 'Open File','/home/pi', 'Cal Files (*.cal)')
-        print(saveFileLocation[0])
         with zipfile.ZipFile(saveFileLocation[0], mode='r') as calibrationData:
             sensorSettings = yaml.full_load(calibrationData.read('sensor_parameters.yaml').decode('utf-8'))
-        print(sensorSettings)
-        pass
+        self.transducer1SlopeLineEdit.setText(sensorSettings['slope'])
+        self.transducer1InterceptLineEdit.setText(sensorSettings['intercept'])
+        self.transducer1SerialLineEdit.setText(sensorSettings['serial'])
 
     def LoadCalibrationTransducer2(self):
-        pass
+        saveFileLocation = QFileDialog.getOpenFileName(self, 'Open File','/home/pi', 'Cal Files (*.cal)')
+        with zipfile.ZipFile(saveFileLocation[0], mode='r') as calibrationData:
+            sensorSettings = yaml.full_load(calibrationData.read('sensor_parameters.yaml').decode('utf-8'))
+        self.transducer2SlopeLineEdit.setText(sensorSettings['slope'])
+        self.transducer2InterceptLineEdit.setText(sensorSettings['intercept'])
+        self.transducer2SerialLineEdit.setText(sensorSettings['serial'])
 
     def LoadSensorSettings(self):
         pass
