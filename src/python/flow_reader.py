@@ -479,12 +479,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             set_avdd_voltage(self.i2c_bus, '4.5v')
             select_avdd_source(self.i2c_bus, internal_source=True)
             set_conversion_rate(self.i2c_bus, conversion_rate='sps10')
-            set_gain(self.i2c_bus, 'x1')
+            set_gain(self.i2c_bus, 'x16')
             start_reading_data(self.i2c_bus, start=True)
             set_avdd_voltage(self.i2c_bus2, '4.5v')
             select_avdd_source(self.i2c_bus2, internal_source=True)
             set_conversion_rate(self.i2c_bus2, conversion_rate='sps10')
-            set_gain(self.i2c_bus2, 'x1')
+            set_gain(self.i2c_bus2, 'x16')
             start_reading_data(self.i2c_bus2, start=True)
             ## Pi-end
 
@@ -527,7 +527,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         rawTransducer2Reading = read_load(self.i2c_bus)
         rawTransducer1Reading = read_load(self.i2c_bus2)
         transducer2Reading = float(self.transducer2SlopeLineEdit.text()) * rawTransducer2Reading + float(self.transducer2InterceptLineEdit.text())
-        transducer1Reading = float(self.transducer1SlopeLineEdit.text()) * rawTransducer1Reading + float(self.transducer1InterceptLineEdit.text())
+        # transducer1Reading = float(self.transducer1SlopeLineEdit.text()) * rawTransducer1Reading + float(self.transducer1InterceptLineEdit.text())
+        transducer1Reading = 0.0
         if self.transducer2RadioButton.isChecked():
             return transducer2Reading - transducer1Reading
         else:
@@ -659,7 +660,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         set_avdd_voltage(bus, '4.5v')
         select_avdd_source(bus, internal_source=True)
         set_conversion_rate(bus, conversion_rate='sps10')
-        set_gain(bus, 'x1')
+        set_gain(bus, 'x16')
         start_reading_data(bus, start=True)
         sleep(0.1)
         gpio.output(self.doneLED, gpio.LOW)
