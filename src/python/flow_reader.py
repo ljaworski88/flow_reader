@@ -17,7 +17,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtGui import QIntValidator, QDoubleValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 import pyqtgraph
 import random
 import serial
@@ -126,6 +127,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.transducer2InterceptLineEdit.setValidator(QDoubleValidator())
         self.lockTimeLineEdit.setValidator(QIntValidator())
         self.addCalibrationDataLineEdit.setValidator(QDoubleValidator())
+        self.saveCalibrationLineEdit.setValidator(QRegExpValidator(QRegExp('\.cal$'),self))
 
         ## Set Combo Box options
         self.statusMessage = 'Welcome!'
@@ -196,6 +198,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.unitsComboBox.activated.connect(self.UpdateAxis)
         self.calibrationUnitsComboBox.currentIndexChanged.connect(self.AdjustCalibration)
         self.saveCalibrationButton.clicked.connect(self.SaveCalibrationData)
+        self.loadTransducer1SettingsButton.clicked.connect(self.LoadCalibrationTransducer1)
+        self.loadTransducer2SettingsButton.clicked.connect(self.LoadCalibrationTransducer2)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
@@ -334,7 +338,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 with open(fileName, 'w') as saveSensor:
                     yaml.dump(saveData, saveSensor)
 
-    def LoadCailbration(self, transducer):
+    def LoadCalibrationTransducer1(self):
+        saveFileLocation = QFileDialog.getOpenFileName(self, tr('Open File'),'/home/pi',tr('Cal Files (*.cal)'))
+        with zipfile.ZipFile(saveFileLocation, mode='r') as calibrationData:
+            yaml.full_load(calibrationData.read('sensor_parameters.yaml').decode('utf-8'))
         pass
 
     def LoadSensorSettings(self):
@@ -688,7 +695,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def SaveCalibrationData(self):
         if not self.saveCalibrationLineEdit.text():
-            saveFileLocation = QFileDialog.getSaveFileName(self)
+            saveFileLocation = QFileDialog.getSaveFileName(self, tr('Save Cal File'), '/home/pi', tr('Cal Files'))
         else:
             saveFileLocation = self.saveCalibrationLineEdit.text()
         saveData = {'slope'     : float(self.readingToPressureSlope),
