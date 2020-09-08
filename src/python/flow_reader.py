@@ -340,6 +340,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def LoadCalibrationTransducer1(self):
         saveFileLocation = QFileDialog.getOpenFileName(self, 'Open File','/home/pi', 'Cal Files (*.cal)')
+        print(saveFileLocation)
         with zipfile.ZipFile(saveFileLocation, mode='r') as calibrationData:
             sensorSettings = yaml.full_load(calibrationData.read('sensor_parameters.yaml').decode('utf-8'))
         print(sensorSettings)
