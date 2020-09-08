@@ -127,7 +127,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.transducer2InterceptLineEdit.setValidator(QDoubleValidator())
         self.lockTimeLineEdit.setValidator(QIntValidator())
         self.addCalibrationDataLineEdit.setValidator(QDoubleValidator())
-        self.saveCalibrationLineEdit.setValidator(QRegExpValidator(QRegExp('\.cal$'),self))
+        self.saveCalibrationLineEdit.setValidator(QRegExpValidator(QRegExp('*\.cal$'),self))
 
         ## Set Combo Box options
         self.statusMessage = 'Welcome!'
