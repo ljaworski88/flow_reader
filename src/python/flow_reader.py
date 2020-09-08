@@ -195,7 +195,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.UpdateErrorBounds)
         self.unitsComboBox.activated.connect(self.UpdateAxis)
         self.calibrationUnitsComboBox.currentIndexChanged.connect(self.AdjustCalibration)
-        self.saveCalibrationButton.clicked.connect(SaveCalibrationData)
+        self.saveCalibrationButton.clicked.connect(self.SaveCalibrationData)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
