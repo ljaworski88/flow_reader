@@ -340,8 +340,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def LoadCalibrationTransducer1(self):
         saveFileLocation = QFileDialog.getOpenFileName(self, 'Open File','/home/pi', 'Cal Files (*.cal)')
-        print(saveFileLocation)
-        with zipfile.ZipFile(saveFileLocation, mode='r') as calibrationData:
+        print(saveFileLocation[0])
+        with zipfile.ZipFile(saveFileLocation[0], mode='r') as calibrationData:
             sensorSettings = yaml.full_load(calibrationData.read('sensor_parameters.yaml').decode('utf-8'))
         print(sensorSettings)
         pass
@@ -702,12 +702,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if not self.saveCalibrationLineEdit.text():
             saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Cal File', '/home/pi', 'Cal Files')
         else:
-            saveFileLocation = self.saveCalibrationLineEdit.text()
+            saveFileLocation = (self.saveCalibrationLineEdit.text(), 'null')
         saveData = {'slope'     : float(self.readingToPressureSlope),
                     'intercept' : float(self.readingToPressureIntercept),
                     'serial'    : self.serialNumberLineEdit.text(),
                     'r_sq'      : float(self.r_sq)}
-        with zipfile.ZipFile(saveFileLocation, mode='w') as calFile:
+        with zipfile.ZipFile(saveFileLocation[0], mode='w') as calFile:
             with calFile.open('sensor_parameters.yaml', 'w') as parameters:
                 parameters.write(bytes(yaml.dump(saveData), 'utf-8'))
             with calFile.open('calibration_points.csv', 'w') as rawPoints:
