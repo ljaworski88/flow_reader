@@ -10,6 +10,8 @@ from os import path
 from subprocess import Popen
 import sys
 import yaml
+import csv
+import zipfile
 from mainWindow import Ui_MainWindow
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -173,6 +175,9 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureCalibrationGraph.getAxis('left').setLabel('Reading Value')
         self.pressureCalibrationGraph.getAxis('bottom').setLabel('Pressure ({})'.format(self.calibrationUnits))
         self.pressureCalibrationGraph.showGrid(x=True, y=True)
+        self.pressureCalibrationGraphViewBox = self.pressureCalibrationGraph.getViewBox()
+        self.pressureCalibrationGraphText = pyqtgraph.TextItem(text='Slope:\nIntercept:\nR^2:')
+        self.pressureCalibrationGraphText.setParentItem(self.pressureCalibrationGraphViewBox)
         self.pressureCalibrationCurve = self.pressureCalibrationGraph.plot(symbol='o', pen=pyqtgraph.mkPen('b', width=3))
         self.pressurePredictionCurve = self.pressureCalibrationGraph.plot(pen=pyqtgraph.mkPen('r', width=2))
 
@@ -190,6 +195,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.UpdateErrorBounds)
         self.unitsComboBox.activated.connect(self.UpdateAxis)
         self.calibrationUnitsComboBox.currentIndexChanged.connect(self.AdjustCalibration)
+        self.saveCalibrationButton.clicked.connect(SaveCalibrationData)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
@@ -398,7 +404,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.lowerBound = float(self.flowSetpointLineEdit.text()) - float(self.errorBoundsLineEdit.text())
         self.upperBound = float(self.flowSetpointLineEdit.text()) + float(self.errorBoundsLineEdit.text())
 
-    #TODO Fix this
     def AdjustCalibration(self):
         self.pressureCalibrationCurve.clear()
         self.pressurePredictionCurve.clear()
@@ -559,6 +564,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     ## Pi-start
                     gpio.output(self.doneLED, gpio.HIGH)
                     ## Pi-end
+                    pass
                 self.RunStopData()
                 if self.logData:
                     self.StartStopLogging()
@@ -669,19 +675,34 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         slope = float(model.coef_[0]) #Get the slope value as a number, sklearn presents it as a 1d array with one element
         self.pressureCalibrationCurve.setData(displayPressures, self.calibrationAverages)
         self.pressurePredictionCurve.setData(displayPressures, predictedReadings)
+        self.pressureCalibrationGraphText.setText('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, self.r_sq))
+        self.pressureCalibrationGraphText.setPos(0,0)
         print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, self.r_sq))
         if slope == float(0):
             self.readingToPressureSlope = 0.0
+            self.readingToPressureIntercept = 0.0
+            self.r_rq = 0.0
         else:
             self.readingToPressureSlope = 1/slope
-        self.readingToPressureIntercept = intercept/slope
+            self.readingToPressureIntercept = -intercept/slope
 
     def SaveCalibrationData(self):
         if not self.saveCalibrationLineEdit.text():
-            dialog = QFileDialog(self)
-            dialog.setFileMode(QFileDialog.AnyFile)
+            saveFileLocation = QFileDialog.getSaveFileName(self)
         else:
             saveFileLocation = self.saveCalibrationLineEdit.text()
+        with zipfile.ZipFile(saveFileLocation, mode='w') as calFile:
+            with calFile.open('sensor_parameters.yaml', 'w') as parameters:
+                saveData = {'slope' : self.readingToPressureSlope,
+                            'intercept' : self.readingToPressureIntercept,
+                            'serial'    : self.serialNumberLineEdit.text(),
+                            'r_sq'      : self.r_sq}
+                yaml.dump(saveData, parameters)
+            with calFile.open('calibration_points.csv', 'w', newline='') as rawPoints:
+                calPointsWriter = csv.writer(rawPoints, delimiter=',')
+                for reading, pressure in zip(self.calibrationAverages, self.calibrationPressures):
+                    calPointsWriter.writerow([reading, pressure])
+
 
 def main():
     app = QApplication(sys.argv)
