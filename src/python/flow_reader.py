@@ -691,17 +691,17 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             saveFileLocation = QFileDialog.getSaveFileName(self)
         else:
             saveFileLocation = self.saveCalibrationLineEdit.text()
+        saveData = {'slope' : self.readingToPressureSlope,
+                    'intercept' : self.readingToPressureIntercept,
+                    'serial'    : self.serialNumberLineEdit.text(),
+                    'r_sq'      : self.r_sq}
         with zipfile.ZipFile(saveFileLocation, mode='w') as calFile:
-            with calFile.open(b'sensor_parameters.yaml', 'w') as parameters:
-                saveData = {'slope' : self.readingToPressureSlope,
-                            'intercept' : self.readingToPressureIntercept,
-                            'serial'    : self.serialNumberLineEdit.text(),
-                            'r_sq'      : self.r_sq}
-                yaml.dump(saveData, parameters)
-            with calFile.open(b'calibration_points.csv', 'w', newline='') as rawPoints:
-                calPointsWriter = csv.writer(rawPoints, delimiter=',')
+            with calFile.open('sensor_parameters.yaml', 'w') as parameters:
+                parameters.write(bytes(yaml.dump(saveData), 'utf-8'))
+            with calFile.open(b'calibration_points.csv', 'w') as rawPoints:
+                rawPoints.writeline(b'reading(units),pressure(Pa)')
                 for reading, pressure in zip(self.calibrationAverages, self.calibrationPressures):
-                    calPointsWriter.writerow([reading, pressure])
+                    rawPoints.writeline(b'{},{}'.format(reading, pressure))
 
 
 def main():
