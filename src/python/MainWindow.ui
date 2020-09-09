@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -39,7 +39,7 @@
              <enum>QTabWidget::North</enum>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="flowGraphTab">
              <attribute name="title">
@@ -58,16 +58,6 @@
              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
                <widget class="PlotWidget" name="pressureGraph"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="currentGraphTab">
-             <attribute name="title">
-              <string>Current</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="0">
-               <widget class="PlotWidget" name="currentGraph"/>
               </item>
              </layout>
             </widget>
@@ -821,6 +811,31 @@ color: rgb(238, 238, 236);</string>
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="conductivityTab">
+       <attribute name="title">
+        <string>Conductivity</string>
+       </attribute>
+       <widget class="QLabel" name="sourcemeterSettingsLabel">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>150</y>
+          <width>703</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(238, 238, 236);</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Source Meter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>

@@ -47,14 +47,6 @@ class Ui_MainWindow(object):
         self.pressureGraph.setObjectName("pressureGraph")
         self.gridLayout_3.addWidget(self.pressureGraph, 0, 0, 1, 1)
         self.graphsTab.addTab(self.pressureGraphTab, "")
-        self.currentGraphTab = QtWidgets.QWidget()
-        self.currentGraphTab.setObjectName("currentGraphTab")
-        self.gridLayout = QtWidgets.QGridLayout(self.currentGraphTab)
-        self.gridLayout.setObjectName("gridLayout")
-        self.currentGraph = PlotWidget(self.currentGraphTab)
-        self.currentGraph.setObjectName("currentGraph")
-        self.gridLayout.addWidget(self.currentGraph, 0, 0, 1, 1)
-        self.graphsTab.addTab(self.currentGraphTab, "")
         self.voltageGraphTab = QtWidgets.QWidget()
         self.voltageGraphTab.setObjectName("voltageGraphTab")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.voltageGraphTab)
@@ -470,6 +462,15 @@ class Ui_MainWindow(object):
         self.addCalibrationDataButton.setObjectName("addCalibrationDataButton")
         self.gridLayout_6.addWidget(self.splitter, 1, 0, 1, 1)
         self.mainTabStack.addTab(self.calibrationTab, "")
+        self.conductivityTab = QtWidgets.QWidget()
+        self.conductivityTab.setObjectName("conductivityTab")
+        self.sourcemeterSettingsLabel = QtWidgets.QLabel(self.conductivityTab)
+        self.sourcemeterSettingsLabel.setGeometry(QtCore.QRect(10, 150, 703, 17))
+        self.sourcemeterSettingsLabel.setStyleSheet("background-color: rgb(0, 0, 0);\n"
+"color: rgb(238, 238, 236);")
+        self.sourcemeterSettingsLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.sourcemeterSettingsLabel.setObjectName("sourcemeterSettingsLabel")
+        self.mainTabStack.addTab(self.conductivityTab, "")
         self.gridLayout_5.addWidget(self.mainTabStack, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -481,8 +482,8 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.mainTabStack.setCurrentIndex(1)
-        self.graphsTab.setCurrentIndex(1)
+        self.mainTabStack.setCurrentIndex(4)
+        self.graphsTab.setCurrentIndex(2)
         self.transducerSettingsTab.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -492,7 +493,6 @@ class Ui_MainWindow(object):
         self.graphicsTab.setToolTip(_translate("MainWindow", "Main Window with Live Graphs"))
         self.graphsTab.setTabText(self.graphsTab.indexOf(self.flowGraphTab), _translate("MainWindow", "Flow"))
         self.graphsTab.setTabText(self.graphsTab.indexOf(self.pressureGraphTab), _translate("MainWindow", "Pressure"))
-        self.graphsTab.setTabText(self.graphsTab.indexOf(self.currentGraphTab), _translate("MainWindow", "Current"))
         self.graphsTab.setTabText(self.graphsTab.indexOf(self.voltageGraphTab), _translate("MainWindow", "Voltage"))
         self.logButton.setText(_translate("MainWindow", "Start Logging"))
         self.runStatusLabel.setText(_translate("MainWindow", "Run Status"))
@@ -555,6 +555,8 @@ class Ui_MainWindow(object):
         self.serialNumberLabel.setText(_translate("MainWindow", "Serial Number"))
         self.addCalibrationDataButton.setText(_translate("MainWindow", "Add Data"))
         self.mainTabStack.setTabText(self.mainTabStack.indexOf(self.calibrationTab), _translate("MainWindow", "Calibration"))
+        self.sourcemeterSettingsLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Source Meter</span></p></body></html>"))
+        self.mainTabStack.setTabText(self.mainTabStack.indexOf(self.conductivityTab), _translate("MainWindow", "Conductivity"))
 from pyqtgraph import PlotWidget
 
 

@@ -66,7 +66,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-        self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        # self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         self.calibrationAverages = []
         self.calibrationPressures = []
         ## Pi-start
@@ -86,10 +86,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                                 'nL' : 1e-9,
                                 'm^3': 1000}
 
-        self.currentUnitsDict = {'A'  : 1,
-                                 'mA' : 1e-3,
-                                 'uA' : 1e-6,
-                                 'nA' : 1e-9}
+        # self.currentUnitsDict = {'A'  : 1,
+                                 # 'mA' : 1e-3,
+                                 # 'uA' : 1e-6,
+                                 # 'nA' : 1e-9}
 
         self.voltageUnitsDict = {'V'  : 1,
                                  'mV' : 1e-3,
@@ -162,11 +162,11 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureGraph.showGrid(x=True, y=True)
         self.pressureCurve = self.pressureGraph.plot()
 
-        self.currentGraph.getAxis('left').setLabel('Current ({})'.format(self.graphUnits[2][0]))
-        self.currentGraph.getAxis('bottom').setLabel('Time (sec)')
-        self.currentGraph.setYRange(-100e-3, 100e-3)
-        self.currentGraph.showGrid(x=True, y=True)
-        self.currentCurve = self.currentGraph.plot()
+        # self.currentGraph.getAxis('left').setLabel('Current ({})'.format(self.graphUnits[2][0]))
+        # self.currentGraph.getAxis('bottom').setLabel('Time (sec)')
+        # self.currentGraph.setYRange(-100e-3, 100e-3)
+        # self.currentGraph.showGrid(x=True, y=True)
+        # self.currentCurve = self.currentGraph.plot()
 
         self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
         self.voltageGraph.getAxis('bottom').setLabel('Time (sec)')
@@ -378,8 +378,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
     def UpdateAxis(self):
         axisScale = {0 : self.AdjustFlow,
                      1 : self.AdjustPressure,
-                     2 : self.AdjustCurrent,
-                     3 : self.AdjustVoltage}
+                     2 : self.AdjustVoltage}
+                     # 2 : self.AdjustCurrent,
         axisScale[self.graphsTab.currentIndex()]()
 
     def AdjustFlow(self):
@@ -399,13 +399,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureGraph.setYRange(-100/self.graphUnits[1][1], 800000/self.graphUnits[1][1])
         self.pressureCurve = self.pressureGraph.plot()
 
-    def AdjustCurrent(self):
-        self.currentCurve.clear()
-        self.graphUnits[2][1] = self.currentUnitsDict[self.unitsComboBox.currentText()]
-        self.graphUnits[2][0] = self.unitsComboBox.currentText()
-        self.currentGraph.getAxis('left').setLabel('Current ({})'.format(self.graphUnits[2][0]))
-        self.currentGraph.setYRange(-100e-3/self.graphUnits[2][1], 100e-3/self.graphUnits[2][1])
-        self.currentCurve = self.currentGraph.plot()
+    # def AdjustCurrent(self):
+        # self.currentCurve.clear()
+        # self.graphUnits[2][1] = self.currentUnitsDict[self.unitsComboBox.currentText()]
+        # self.graphUnits[2][0] = self.unitsComboBox.currentText()
+        # self.currentGraph.getAxis('left').setLabel('Current ({})'.format(self.graphUnits[2][0]))
+        # self.currentGraph.setYRange(-100e-3/self.graphUnits[2][1], 100e-3/self.graphUnits[2][1])
+        # self.currentCurve = self.currentGraph.plot()
 
     def AdjustVoltage(self):
         self.voltageCurve.clear()
@@ -455,7 +455,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+            # self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.AdjustErrorBounds()
             self.currentlyRunning = True
             if not self.transducer2SlopeLineEdit.text() or not self.transducer1SlopeLineEdit.text():
@@ -471,6 +471,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             reset_sensor(self.i2c_bus)
             self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
             self.sourceMeter.write('syst:zch 0')
+            self.sourceMeter.write('conf:volt:dc')
             sleep(0.5)
             ## Pi-end
 
@@ -512,7 +513,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.logButton.setText('Stop Logging')
             try:
                 with open(self.logFileLineEdit.text(), 'x') as fileHeader:
-                    fileHeader.write('Time,Flow_Rate(L/s),Pressure(Pa),Current(A),Voltage(V)\n')
+                    fileHeader.write('Time,Flow_Rate(L/s),Pressure(Pa),Voltage(V)\n')
             except FileExistsError:
                 self.msg = QMessageBox()
                 self.msg.setWindowTitle('File Exists!')
@@ -521,7 +522,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.show()
                 with open(self.logFileLineEdit.text(), 'a') as fileHeader:
-                    fileHeader.write('BREAK,BREAK,BREAK,BREAK,BREAK\n')
+                    fileHeader.write('BREAK,BREAK,BREAK,BREAK\n')
 
 
     def PressureDifferential(self):
@@ -555,10 +556,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             pressureDifferentialReading = -1
 
         try:
-            currentReading = float(self.sourceMeter.query(':meas:curr:dc?').split(',')[0])
-            voltageReading = float(self.sourceMeter.query(':meas:volt:dc?').split(',')[0])
+            # currentReading = float(self.sourceMeter.query(':meas:curr:dc?').split(',')[0])
+            voltageReading = float(self.sourceMeter.query('read?').split(',')[0])
         except:
-            currentReading = -1
+            # currentReading = -1
             voltageReading = -1
         ## Pi-end
 
@@ -570,12 +571,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## not-Pi-end
         if self.logData:
             with open(self.logFileLineEdit.text(), 'a') as data:
-                data.write('{},{},{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading, currentReading, voltageReading))
+                data.write('{},{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading, voltageReading))
 
         self.flowData.append(flowReading)
         self.pressureData.append(pressureDifferentialReading)
         self.voltageData.append(voltageReading)
-        self.currentData.append(currentReading)
+        # self.currentData.append(currentReading)
         if self.lowerBound < self.flowData[-1] < self.upperBound and len(self.flowData) == self.flowData.maxlen:
             if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < 25:
                 self.CalculateResult()
@@ -629,16 +630,16 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if self.mainTabStack.currentIndex() == 0:
             updateGraph = {0 : self.UpdateFlowGraph,
                            1 : self.UpdatePressureGraph,
-                           2 : self.UpdateCurrentGraph,
-                           3 : self.UpdateVoltageGraph}
+                           2 : self.UpdateVoltageGraph}
+                           # 2 : self.UpdateCurrentGraph,
             updateGraph[self.graphsTab.currentIndex()]()
 
     def UpdateGraphUnits(self):
         self.unitsComboBox.clear()
         newUnitOptions = {0 : self.flowRates,
                           1 : self.pressureUnitsDict.keys(),
-                          2 : self.currentUnitsDict.keys(),
-                          3 : self.voltageUnitsDict.keys()}
+                          2 : self.voltageUnitsDict.keys()}
+                          # 2 : self.currentUnitsDict.keys(),
         self.unitsComboBox.addItems(newUnitOptions[self.graphsTab.currentIndex()])
         self.unitsComboBox.setCurrentText(self.graphUnits[self.graphsTab.currentIndex()][0])
 
@@ -658,13 +659,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureCurve.setData(timeVals, pressureVals)
         self.currentReadingLCD.display(pressureVals[-1])
 
-    def UpdateCurrentGraph(self):
-        currentVals = list(self.currentData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        currentVals = list(np.divide(currentVals, self.graphUnits[2][1]))
-        timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        timeVals = list(np.subtract(timeVals, timeVals[-1]))
-        self.currentCurve.setData(timeVals, currentVals)
-        self.currentReadingLCD.display(currentVals[-1])
+    # def UpdateCurrentGraph(self):
+        # currentVals = list(self.currentData)[-int(5 * 60 * 1000 / self.timerInterval):]
+        # currentVals = list(np.divide(currentVals, self.graphUnits[2][1]))
+        # timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
+        # timeVals = list(np.subtract(timeVals, timeVals[-1]))
+        # self.currentCurve.setData(timeVals, currentVals)
+        # self.currentReadingLCD.display(currentVals[-1])
 
     def UpdateVoltageGraph(self):
         voltageVals = list(self.voltageData)[-int(5 * 60 * 1000 / self.timerInterval):]
