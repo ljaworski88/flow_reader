@@ -625,9 +625,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         else:
             saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
         with open(saveFileLocation, 'x', newline='') as resultsCSV:
-            resultsWriter = csv.writer(resultsCSV, delimiter='')
-            resultsWriter.writerow('Streaming Potential (V),Hydraulic Permiability (m^3*s/kg) - measured flow,Hydraulic Permiability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)')
-            resultsWriter.writerow('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermiabilityMeasured, self.hydraulicPermiabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
+            resultsCSV.writerow('Streaming Potential (V),Hydraulic Permiability (m^3*s/kg) - measured flow,Hydraulic Permiability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)')
+            resultsCSV.writerow('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermiabilityMeasured, self.hydraulicPermiabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
 
     def UpdateGraphs(self):
         if self.mainTabStack.currentIndex() == 0:
