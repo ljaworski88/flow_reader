@@ -617,10 +617,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermiability)
 
-        if path.isfile(self.saveResultsNameLineEdit.text()):
-            saveFileLocation = self.saveResultsNameLineEdit.text()
+        if self.saveResultsNameLineEdit.text():
+            if path.isfile(self.saveResultsNameLineEdit.text()):
+                saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
+            else:
+                saveFileLocation = self.saveResultsNameLineEdit.text()
         else:
-            saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Cal File', '/home/pi', 'Cal Files')
+            saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
         with open(saveFileLocation, 'x', newline='') as resultsCSV:
             resultsWriter = csv.writer(resultsCSV, delimiter=',')
             resultsWriter.writerow('Streaming Potential (V),Hydraulic Permiability (m^3*s/kg) - measured flow,Hydraulic Permiability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)')
