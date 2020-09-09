@@ -617,7 +617,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermiability)
 
-        if path.isfile(saveResultsNameLineEdit.text()):
+        if path.isfile(self.saveResultsNameLineEdit.text()):
             saveFileLocation = self.saveResultsNameLineEdit.text()
         else:
             saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Cal File', '/home/pi', 'Cal Files')
