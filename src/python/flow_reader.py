@@ -200,6 +200,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.saveCalibrationButton.clicked.connect(self.SaveCalibrationData)
         self.loadTransducer1SettingsButton.clicked.connect(self.LoadCalibrationTransducer1)
         self.loadTransducer2SettingsButton.clicked.connect(self.LoadCalibrationTransducer2)
+        self.calculateResultButton.clicked.connect(self.CalculateResult)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
@@ -469,7 +470,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             boot_cycle(self.i2c_bus2)
             reset_sensor(self.i2c_bus)
             self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
-            self.sourceMeter.write("*RST")
+            self.sourceMeter.write('syst:zch 0')
             sleep(0.5)
             ## Pi-end
 
@@ -543,14 +544,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         timepoint = time()
         self.timeData.append(timepoint)
         ## Pi-start
-        flowReading = self.ReadFlow()
+        try:
+            flowReading = self.ReadFlow()
+        except:
+            flowReading = -1
 
-        pressureDifferentialReading = self.PressureDifferential()
+        try:
+            pressureDifferentialReading = self.PressureDifferential()
+        except:
+            pressureDifferentialReading = -1
 
-        instrumentResponse = self.sourceMeter.query(':meas:curr:dc?')
-        currentReading, voltageReading, _, _, _ = instrumentResponse.split(',')
-        currentReading = float(currentReading)
-        voltageReading = float(voltageReading)
+        try:
+            currentReading = float(self.sourceMeter.query(':meas:curr:dc?').split(',')[0])
+            voltageReading = float(self.sourceMeter.query(':meas:volt:dc?').split(',')[0])
+        except:
+            currentReading = -1
+            voltageReading = -1
         ## Pi-end
 
         ## not-Pi-start
@@ -569,6 +578,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.currentData.append(currentReading)
         if self.lowerBound < self.flowData[-1] < self.upperBound and len(self.flowData) == self.flowData.maxlen:
             if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < 25:
+                self.CalculateResult()
                 if self.popUpDoneCheckBox.isChecked():
                     self.msg = QMessageBox()
                     self.msg.setWindowTitle('Experiment Progress')
@@ -588,6 +598,32 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     self.StartStopLogging()
                 return
         self.UpdateGraphs()
+
+    def CalculateResult(self):
+        ## k=Qh/pA
+        ## psi = -((Fc) * (cF) * k * p) / chi
+        meanFlow = mean(list(self.flowData)[-100:]) / self.volumeUnitsDict['m^3']
+        volumeUnit, timeUnit = self.flowSetpointUnitsComboBox.currentText().split('/')
+        predictedFlow = float(self.flowSetpointLineEdit.text()) * self.timeUnitsDict[timeUnit] / self.volumeUnitsDict[volumeUnit] / self.volumeUnitsDict['m^3']
+        tissueThickness = float(self.tissueThicknessLineEdit.text()) * self.thicknessUnitsDict[self.tissueThicknessUnitsComboBox.currentText()]
+        pressureDifferential = mean(list(self.pressureData)[-100:])
+        crossSectionArea = float(self.crossSectionLineEdit.text()) * self.areaUnitsDict[self.crossSectionUnitsComboBox.currentText()]
+        self.streamingPotential = mean(list(self.voltageData)[-100:])
+        # conductivity = float(self.conductivityLineEdit.text()) * self.conductivityUnitsDict[self.conductivityUnitsComboBox.currentText()]
+
+        self.hydraulicPermiabilityMeasured = meanFlow * tissueThickness / (pressureDifferential * crossSectionArea)
+        self.hydraulicPermiabilityPredicted = predictedFlow * tissueThickness / (pressureDifferential * crossSectionArea)
+
+        # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermiability)
+
+        if path.isfile(saveResultsNameLineEdit.text()):
+            saveFileLocation = self.saveResultsNameLineEdit.text()
+        else:
+            saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Cal File', '/home/pi', 'Cal Files')
+        with open(saveFileLocation, 'x', newline='') as resultsCSV:
+            resultsWriter = csv.writer(resultsCSV, delimiter=',')
+            resultsWriter.writerow('Streaming Potential (V),Hydraulic Permiability (m^3*s/kg) - measured flow,Hydraulic Permiability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)')
+            resutsWriter.writerow(self.streamingPotential, self.hydraulicPermiabilityMeasured, self.hydraulicPermiabilityPredicted, pressureDifferential, meanFlow, predictedFlow)
 
     def UpdateGraphs(self):
         if self.mainTabStack.currentIndex() == 0:
