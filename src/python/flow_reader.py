@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from sf04_sensor.sf04 import *
+from sf04 import *
 from nau7802 import *
 import visa
 from time import sleep, time
@@ -41,8 +41,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## Initalize some library resource, state variables, and data arrays for later
         self.graphUnits = {0 : ['nL/min', 1e-9/60],
                            1 : ['Pa', 1],
-                           2 : ['A', 1],
-                           3 : ['V', 1]}
+                           2 : ['V', 1]}
+                           # 2 : ['A', 1],
         self.calibrationUnits = 'Pa'
         self.r_sq = None
         self.readingToPressureSlope = None
@@ -65,7 +65,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
         self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-        self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+        # self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         # self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         self.calibrationAverages = []
         self.calibrationPressures = []
@@ -91,10 +91,10 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                                  # 'uA' : 1e-6,
                                  # 'nA' : 1e-9}
 
-        self.voltageUnitsDict = {'V'  : 1,
-                                 'mV' : 1e-3,
-                                 'uV' : 1e-6,
-                                 'nV' : 1e-9}
+        # self.voltageUnitsDict = {'V'  : 1,
+                                 # 'mV' : 1e-3,
+                                 # 'uV' : 1e-6,
+                                 # 'nV' : 1e-9}
 
         self.pressureUnitsDict = {'Pa'   : 1,
                                   'psi'  : 6894.76,
@@ -127,7 +127,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.transducer2InterceptLineEdit.setValidator(QDoubleValidator())
         self.lockTimeLineEdit.setValidator(QIntValidator())
         self.addCalibrationDataLineEdit.setValidator(QDoubleValidator())
-        # self.saveCalibrationLineEdit.setValidator(QRegExpValidator(QRegExp('*\.cal$'),self))
+        self.conductivityLineEdit.setValidator(QDoubleValidator())
+        self.saveCalibrationLineEdit.setValidator(QRegExpValidator(QRegExp('*.\.cal$'),self))
 
         ## Set Combo Box options
         self.statusMessage = 'Welcome!'
@@ -168,11 +169,11 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         # self.currentGraph.showGrid(x=True, y=True)
         # self.currentCurve = self.currentGraph.plot()
 
-        self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
-        self.voltageGraph.getAxis('bottom').setLabel('Time (sec)')
-        self.voltageGraph.setYRange(-100e-3, 100e-3)
-        self.voltageGraph.showGrid(x=True, y=True)
-        self.voltageCurve = self.voltageGraph.plot()
+        # self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
+        # self.voltageGraph.getAxis('bottom').setLabel('Time (sec)')
+        # self.voltageGraph.setYRange(-500e-3, 500e-3)
+        # self.voltageGraph.showGrid(x=True, y=True)
+        # self.voltageCurve = self.voltageGraph.plot()
 
         self.pressureCalibrationGraph.getAxis('left').setLabel('Reading Value')
         self.pressureCalibrationGraph.getAxis('bottom').setLabel('Pressure ({})'.format(self.calibrationUnits))
@@ -201,6 +202,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.loadTransducer1SettingsButton.clicked.connect(self.LoadCalibrationTransducer1)
         self.loadTransducer2SettingsButton.clicked.connect(self.LoadCalibrationTransducer2)
         self.calculateResultButton.clicked.connect(self.CalculateResult)
+        self.errorBoundsLineEdit.editingFinished.connect(self.AdjustErrorBounds)
+        self.errorBoundsUnitsComboBox.currentIndexChanged.connect(self.AdjustErrorBounds)
+        self.flowSetpointLineEdit.editingFinished.connect(self.AdjustErrorBounds)
+        self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.AdjustErrorBounds)
+        self.loadFlowReaderSettingsButton.clicked.connect(self.LoadSensorSettings)
+        self.saveSensorSettingsButton.clicked.connect(self.SaveSensorSettings)
+        self.loadExperimentSettingsButton.clicked.connect(self.LoadExperimentSettings)
+        self.saveExperimentSettingsButton.clicked.connect(self.SaveExperimentSettings)
 
         ## Save settings Signal emitters
         self.runStopButton.clicked.connect(self.SaveGlobalSettings)
@@ -223,7 +232,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.tissueThicknessUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
         self.flowSetpointLineEdit.editingFinished.connect(self.SaveGlobalSettings)
         self.flowSetpointUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
-        self.averagingDepthSpinBox.valueChanged.connect(self.SaveGlobalSettings)
         self.errorBoundsLineEdit.editingFinished.connect(self.SaveGlobalSettings)
         self.errorBoundsUnitsComboBox.currentIndexChanged.connect(self.SaveGlobalSettings)
         self.lockTimeLineEdit.editingFinished.connect(self.SaveGlobalSettings)
@@ -260,7 +268,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.tissueThicknessUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Tissue Thickness Units'])
             self.flowSetpointLineEdit.setText(loadedSettings['Experiment']['Flow Setpoint'])
             self.flowSetpointUnitsComboBox.setCurrentText(loadedSettings['Experiment']['Flow Setpoint Units'])
-            self.averagingDepthSpinBox.setValue(loadedSettings['Experiment']['Averaging Depth'])
             self.errorBoundsLineEdit.setText(loadedSettings['Experiment']['Flow Error Bounds'])
             if loadedSettings['Experiment']['Flow Error Units'] == '%':
                 self.errorBoundsUnitsComboBox.clear()
@@ -288,6 +295,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             yaml.dump(saveData, saveSettings)
 
     def SaveSensorSettings(self, fileName=None):
+        print(fileName)
         saveData = {'Flow Meter' : self.resolutionSettingSpinBox.value(),
                     'Pressure Transducer' : {'High Side-Transducer2' : self.transducer2RadioButton.isChecked(),
                                              'High Side-Transducer1' : self.transducer1RadioButton.isChecked(),
@@ -312,6 +320,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     yaml.dump(saveData, saveSensor)
 
     def SaveExperimentSettings(self, fileName=None):
+        print(fileName)
         saveData = {'Results Save' : self.saveResultsNameLineEdit.text(),
                     'Cross Section' : self.crossSectionLineEdit.text(),
                     'Cross Section Units' : self.crossSectionUnitsComboBox.currentText(),
@@ -319,7 +328,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                     'Tissue Thickness Units' : self.tissueThicknessUnitsComboBox.currentText(),
                     'Flow Setpoint' : self.flowSetpointLineEdit.text(),
                     'Flow Setpoint Units' : self.flowSetpointUnitsComboBox.currentText(),
-                    'Averaging Depth' : self.averagingDepthSpinBox.value(),
                     'Flow Error Bounds' : self.errorBoundsLineEdit.text(),
                     'Flow Error Units' : self.errorBoundsUnitsComboBox.currentText(),
                     'Lock Time' : self.lockTimeLineEdit.text(),
@@ -355,10 +363,64 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.transducer2InterceptLineEdit.setText(str(sensorSettings['intercept']))
         self.transducer2SerialLineEdit.setText(str(sensorSettings['serial']))
 
-    def LoadSensorSettings(self):
-        pass
+    #TODO
+    def LoadSensorSettings(self, fileName=None):
+        print(fileName)
+        if self.loadFlowReaderSettingsLineEdit.text():
+            fileName = self.loadFlowReaderSettingsLineEdit.text()
+        if not path.isfile(fileName):
+            fileName = QFileDialog.getOpenFileName(self, 'Save Sensor Settings', '/home/pi', 'YAML Files (*.yaml, *.yml)')[0]
+        with open(fileName, 'r') as settings:
+            loadedSettings = yaml.full_load(settings)
 
-    def LoadExperimentSettings(self):
+        self.resolutionSettingSpinBox.setValue(loadedSettings['Flow Meter'])
+
+        self.transducer2RadioButton.setChecked(loadedSettings['Pressure Transducer']['High Side-Transducer2'])
+        self.transducer2SlopeLineEdit.setText(loadedSettings['Pressure Transducer']['Transducer2']['Slope'])
+        self.transducer2InterceptLineEdit.setText(loadedSettings['Pressure Transducer']['Transducer2']['Intercept'])
+        self.transducer2SerialLineEdit.setText(loadedSettings['Pressure Transducer']['Transducer2']['Serial'])
+        self.transducer2UnitComboBox.setCurrentText(loadedSettings['Pressure Transducer']['Transducer2']['Units'])
+
+        self.transducer1RadioButton.setChecked(loadedSettings['Pressure Transducer']['High Side-Transducer1'])
+        self.transducer1SlopeLineEdit.setText(loadedSettings['Pressure Transducer']['Transducer1']['Slope'])
+        self.transducer1InterceptLineEdit.setText(loadedSettings['Pressure Transducer']['Transducer1']['Intercept'])
+        self.transducer1SerialLineEdit.setText(loadedSettings['Pressure Transducer']['Transducer1']['Serial'])
+        self.transducer1UnitComboBox.setCurrentText(loadedSettings['Pressure Transducer']['Transducer1']['Units'])
+
+    #TODO
+    def LoadExperimentSettings(self, fileName=None):
+        print(fileName)
+        if self.loadExperimentSettingsLineEdit.text():
+            fileName = self.loadExperimentSettingsLineEdit.text()
+        if not path.isfile(fileName):
+            fileName = QFileDialog.getOpenFileName(self, 'Save Experiment Settings', '/home/pi', 'YAML Files (*.yaml, *.yml)')[0]
+        with open(fileName, 'r') as settings:
+            loadedSettings = yaml.full_load(settings)
+        self.saveResultsNameLineEdit.setText(loadedSettings['Results Save'])
+        self.crossSectionLineEdit.setText(loadedSettings['Cross Section'])
+        self.crossSectionUnitsComboBox.setCurrentText(loadedSettings['Cross Section Units'])
+        self.tissueThicknessLineEdit.setText(loadedSettings['Tissue Thickness'])
+        self.tissueThicknessUnitsComboBox.setCurrentText(loadedSettings['Tissue Thickness Units'])
+        self.flowSetpointLineEdit.setText(loadedSettings['Flow Setpoint'])
+        self.flowSetpointUnitsComboBox.setCurrentText(loadedSettings['Flow Setpoint Units'])
+        self.errorBoundsLineEdit.setText(loadedSettings['Flow Error Bounds'])
+        if loadedSettings['Flow Error Units'] == '%':
+            self.errorBoundsUnitsComboBox.clear()
+            self.errorBoundsUnitsComboBox.addItem('%')
+            self.errorBoundsUnitsComboBox.addItem(self.flowSetpointUnitsComboBox.currentText())
+            self.errorBoundsUnitsComboBox.setCurrentText('%')
+        else:
+            self.errorBoundsUnitsComboBox.clear()
+            self.errorBoundsUnitsComboBox.addItem('%')
+            self.errorBoundsUnitsComboBox.addItem(loadedSettings['Flow Error Units'])
+            self.errorBoundsUnitsComboBox.setCurrentText(loadedSettings['Flow Error Units'])
+        self.lockTimeLineEdit.setText(loadedSettings['Lock Time'])
+        self.lockTimeUnitsComboBox.setCurrentText(loadedSettings['Lock Time Units'])
+        self.soundDoneCheckBox.setChecked(loadedSettings['Done Sound'])
+        self.ledDoneCheckBox.setChecked(loadedSettings['Done LED'])
+        self.popUpDoneCheckBox.setChecked(loadedSettings['Done Pop-Up'])
+        self.loadExperimentSettingsLineEdit.setText(loadedSettings['Save'])
+
         pass
 
     def UpdateErrorBounds(self):
@@ -377,8 +439,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
     def UpdateAxis(self):
         axisScale = {0 : self.AdjustFlow,
-                     1 : self.AdjustPressure,
-                     2 : self.AdjustVoltage}
+                     1 : self.AdjustPressure}
+                     # 2 : self.AdjustVoltage}
                      # 2 : self.AdjustCurrent,
         axisScale[self.graphsTab.currentIndex()]()
 
@@ -407,13 +469,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         # self.currentGraph.setYRange(-100e-3/self.graphUnits[2][1], 100e-3/self.graphUnits[2][1])
         # self.currentCurve = self.currentGraph.plot()
 
-    def AdjustVoltage(self):
-        self.voltageCurve.clear()
-        self.graphUnits[3][1] = self.voltageUnitsDict[self.unitsComboBox.currentText()]
-        self.graphUnits[3][0] = self.unitsComboBox.currentText()
-        self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
-        self.voltageGraph.setYRange(-100e-3/self.graphUnits[3][1], 100e-3/self.graphUnits[3][1])
-        self.voltageCurve = self.voltageGraph.plot()
+    # def AdjustVoltage(self):
+        # self.voltageCurve.clear()
+        # self.graphUnits[3][1] = self.voltageUnitsDict[self.unitsComboBox.currentText()]
+        # self.graphUnits[3][0] = self.unitsComboBox.currentText()
+        # self.voltageGraph.getAxis('left').setLabel('Voltage ({})'.format(self.graphUnits[3][0]))
+        # self.voltageGraph.setYRange(-100e-3/self.graphUnits[3][1], 100e-3/self.graphUnits[3][1])
+        # self.voltageCurve = self.voltageGraph.plot()
 
     def AdjustErrorBounds(self):
         if self.errorBoundsUnitsComboBox.currentText() == '%':
@@ -454,7 +516,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+            # self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             # self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.AdjustErrorBounds()
             self.currentlyRunning = True
@@ -470,8 +532,8 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             boot_cycle(self.i2c_bus2)
             reset_sensor(self.i2c_bus)
             self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
-            self.sourceMeter.write('syst:zch 0')
             self.sourceMeter.write('conf:volt:dc')
+            self.sourceMeter.write('syst:zch 0')
             sleep(0.5)
             ## Pi-end
 
@@ -513,7 +575,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.logButton.setText('Stop Logging')
             try:
                 with open(self.logFileLineEdit.text(), 'x') as fileHeader:
-                    fileHeader.write('Time,Flow_Rate(L/s),Pressure(Pa),Voltage(V)\n')
+                    fileHeader.write('Time(Unix Epoch),Flow_Rate(L/s),Pressure(Pa)\n')
             except FileExistsError:
                 self.msg = QMessageBox()
                 self.msg.setWindowTitle('File Exists!')
@@ -555,12 +617,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         except:
             pressureDifferentialReading = -1
 
-        try:
-            # currentReading = float(self.sourceMeter.query(':meas:curr:dc?').split(',')[0])
-            voltageReading = float(self.sourceMeter.query('read?').split(',')[0])
-        except:
-            # currentReading = -1
-            voltageReading = -1
+        # try:
+            # # currentReading = float(self.sourceMeter.query(':meas:curr:dc?').split(',')[0])
+            # voltageReading = float(self.sourceMeter.query('read?').split(',')[0])
+        # except:
+            # # currentReading = -1
+            # voltageReading = -1
         ## Pi-end
 
         ## not-Pi-start
@@ -571,14 +633,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## not-Pi-end
         if self.logData:
             with open(self.logFileLineEdit.text(), 'a') as data:
-                data.write('{},{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading, voltageReading))
+                data.write('{},{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading))
 
         self.flowData.append(flowReading)
         self.pressureData.append(pressureDifferentialReading)
-        self.voltageData.append(voltageReading)
+        # self.voltageData.append(voltageReading)
         # self.currentData.append(currentReading)
         if self.lowerBound < self.flowData[-1] < self.upperBound and len(self.flowData) == self.flowData.maxlen:
-            if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < 25:
+            if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < ((self.upperBound - self.lowerBound) / 4):
                 self.CalculateResult()
                 if self.popUpDoneCheckBox.isChecked():
                     self.msg = QMessageBox()
@@ -605,17 +667,20 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## psi = -((Fc) * (cF) * k * p) / chi
         meanFlow = mean(list(self.flowData)[-100:]) / self.volumeUnitsDict['m^3']
         volumeUnit, timeUnit = self.flowSetpointUnitsComboBox.currentText().split('/')
-        predictedFlow = float(self.flowSetpointLineEdit.text()) * self.timeUnitsDict[timeUnit] / self.volumeUnitsDict[volumeUnit] / self.volumeUnitsDict['m^3']
+        predictedFlow = float(self.flowSetpointLineEdit.text()) / self.timeUnitsDict[timeUnit] * self.volumeUnitsDict[volumeUnit] / self.volumeUnitsDict['m^3']
         tissueThickness = float(self.tissueThicknessLineEdit.text()) * self.thicknessUnitsDict[self.tissueThicknessUnitsComboBox.currentText()]
         pressureDifferential = mean(list(self.pressureData)[-100:])
         crossSectionArea = float(self.crossSectionLineEdit.text()) * self.areaUnitsDict[self.crossSectionUnitsComboBox.currentText()]
-        self.streamingPotential = mean(list(self.voltageData)[-100:])
-        # conductivity = float(self.conductivityLineEdit.text()) * self.conductivityUnitsDict[self.conductivityUnitsComboBox.currentText()]
+        self.streamingPotential = float(self.sourceMeter.query('read?').split(',')[0])
+        # self.streamingPotential = mean(list(self.voltageData)[-100:])
+        if self.conductivityLineEdit.text():
+            conductivity = float(self.conductivityLineEdit.text())
+        faradayConstant = 96485.33212
 
-        self.hydraulicPermiabilityMeasured = meanFlow * tissueThickness / (pressureDifferential * crossSectionArea)
-        self.hydraulicPermiabilityPredicted = predictedFlow * tissueThickness / (pressureDifferential * crossSectionArea)
+        self.hydraulicPermeabilityMeasured = meanFlow * tissueThickness / (pressureDifferential * crossSectionArea)
+        self.hydraulicPermeabilityPredicted = predictedFlow * tissueThickness / (pressureDifferential * crossSectionArea)
 
-        # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermiability)
+        # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermeability)
 
         if self.saveResultsNameLineEdit.text():
             if path.isfile(self.saveResultsNameLineEdit.text()):
@@ -625,22 +690,22 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         else:
             saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
         with open(saveFileLocation, 'x', newline='') as resultsCSV:
-            resultsCSV.write('Streaming Potential (V),Hydraulic Permiability (m^3*s/kg) - measured flow,Hydraulic Permiability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)\n')
-            resultsCSV.write('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermiabilityMeasured, self.hydraulicPermiabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
+            resultsCSV.write('Streaming Potential (V),Hydraulic Permeability (m^3*s/kg) - measured flow,Hydraulic Permeability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)\n')
+            resultsCSV.write('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermeabilityMeasured, self.hydraulicPermeabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
 
     def UpdateGraphs(self):
         if self.mainTabStack.currentIndex() == 0:
             updateGraph = {0 : self.UpdateFlowGraph,
-                           1 : self.UpdatePressureGraph,
-                           2 : self.UpdateVoltageGraph}
+                           1 : self.UpdatePressureGraph}
+                           # 2 : self.UpdateVoltageGraph}
                            # 2 : self.UpdateCurrentGraph,
             updateGraph[self.graphsTab.currentIndex()]()
 
     def UpdateGraphUnits(self):
         self.unitsComboBox.clear()
         newUnitOptions = {0 : self.flowRates,
-                          1 : self.pressureUnitsDict.keys(),
-                          2 : self.voltageUnitsDict.keys()}
+                          1 : self.pressureUnitsDict.keys()}
+                          # 2 : self.voltageUnitsDict.keys()}
                           # 2 : self.currentUnitsDict.keys(),
         self.unitsComboBox.addItems(newUnitOptions[self.graphsTab.currentIndex()])
         self.unitsComboBox.setCurrentText(self.graphUnits[self.graphsTab.currentIndex()][0])
@@ -669,13 +734,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         # self.currentCurve.setData(timeVals, currentVals)
         # self.currentReadingLCD.display(currentVals[-1])
 
-    def UpdateVoltageGraph(self):
-        voltageVals = list(self.voltageData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        voltageVals = list(np.divide(voltageVals, self.graphUnits[3][1]))
-        timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
-        timeVals = list(np.subtract(timeVals, timeVals[-1]))
-        self.voltageCurve.setData(timeVals, voltageVals)
-        self.currentReadingLCD.display(voltageVals[-1])
+    # def UpdateVoltageGraph(self):
+        # voltageVals = list(self.voltageData)[-int(5 * 60 * 1000 / self.timerInterval):]
+        # voltageVals = list(np.divide(voltageVals, self.graphUnits[3][1]))
+        # timeVals = list(self.timeData)[-int(5 * 60 * 1000 / self.timerInterval):]
+        # timeVals = list(np.subtract(timeVals, timeVals[-1]))
+        # self.voltageCurve.setData(timeVals, voltageVals)
+        # self.currentReadingLCD.display(voltageVals[-1])
 
     def UpdateLockTime(self):
         if self.timeUnitsDict[self.lockTimeUnitsComboBox.currentText()] * int(self.lockTimeLineEdit.text()) < 5 * 60: # don't allow a lock time shorter than 5 minutes

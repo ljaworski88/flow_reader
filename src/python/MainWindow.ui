@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_5">
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
@@ -39,7 +39,7 @@
              <enum>QTabWidget::North</enum>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="flowGraphTab">
              <attribute name="title">
@@ -58,16 +58,6 @@
              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
                <widget class="PlotWidget" name="pressureGraph"/>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="voltageGraphTab">
-             <attribute name="title">
-              <string>Voltage</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="PlotWidget" name="voltageGraph"/>
               </item>
              </layout>
             </widget>
@@ -463,18 +453,53 @@ color: rgb(238, 238, 236);</string>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="loadSettingsHorizontalLayout">
+         <widget class="QLabel" name="sourcemeterSettingsLabel">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(238, 238, 236);</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Source Meter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QLineEdit" name="loadFlowReaderSettingsLineEdit"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLineEdit" name="condutivityLineEdit"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="conductivityLabel">
+              <property name="text">
+               <string>Tissue Conductivity (S/m)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="loadFlowReaderSettingsButton">
+           <widget class="QPushButton" name="loadConductivityButton">
             <property name="text">
-             <string>Load Settings</string>
+             <string>Load Conductivity</string>
             </property>
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="loadFlowReaderSettingsLineEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="loadFlowReaderSettingsButton">
+          <property name="text">
+           <string>Load Settings</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="saveSensorSettingsButton">
@@ -531,9 +556,19 @@ color: rgb(238, 238, 236);</string>
             <item row="0" column="1">
              <widget class="QLabel" name="crossSectionLabel">
               <property name="text">
-               <string>Cross-Sectional Area</string>
+               <string> Effective Cross-Sectional Area</string>
               </property>
              </widget>
+            </item>
+            <item row="1" column="0">
+             <layout class="QVBoxLayout" name="tissueThicknessVerticalLayout">
+              <item>
+               <widget class="QLineEdit" name="tissueThicknessLineEdit"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="tissueThicknessUnitsComboBox"/>
+              </item>
+             </layout>
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="tissueThicknessLabel">
@@ -560,34 +595,6 @@ color: rgb(238, 238, 236);</string>
              </widget>
             </item>
             <item row="3" column="0">
-             <widget class="QSpinBox" name="averagingDepthSpinBox">
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>100</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <layout class="QVBoxLayout" name="averagingVerticalLayout">
-              <item>
-               <widget class="QLabel" name="flowRateLabel">
-                <property name="text">
-                 <string>Flow Rate</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="averagingDepthLabel">
-                <property name="text">
-                 <string>Averaging Depth</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="4" column="0">
              <layout class="QVBoxLayout" name="errorBoundsVerticalLayout">
               <item>
                <widget class="QLineEdit" name="errorBoundsLineEdit"/>
@@ -597,14 +604,14 @@ color: rgb(238, 238, 236);</string>
               </item>
              </layout>
             </item>
-            <item row="4" column="1">
+            <item row="3" column="1">
              <widget class="QLabel" name="errorBoundsLabel">
               <property name="text">
                <string>Setpoint Error Bounds</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
+            <item row="4" column="0">
              <layout class="QVBoxLayout" name="lockTimeVerticalLayout">
               <item>
                <widget class="QLineEdit" name="lockTimeLineEdit"/>
@@ -614,22 +621,12 @@ color: rgb(238, 238, 236);</string>
               </item>
              </layout>
             </item>
-            <item row="5" column="1">
+            <item row="4" column="1">
              <widget class="QLabel" name="lockTimeLabel">
               <property name="text">
                <string>Lock In Time</string>
               </property>
              </widget>
-            </item>
-            <item row="1" column="0">
-             <layout class="QVBoxLayout" name="tissueThicknessVerticalLayout">
-              <item>
-               <widget class="QLineEdit" name="tissueThicknessLineEdit"/>
-              </item>
-              <item>
-               <widget class="QComboBox" name="tissueThicknessUnitsComboBox"/>
-              </item>
-             </layout>
             </item>
            </layout>
           </item>
@@ -665,18 +662,14 @@ color: rgb(238, 238, 236);</string>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="loadExperimentSettingsHorizontalLayout">
-            <item>
-             <widget class="QLineEdit" name="loadExperimentSettingsLineEdit"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="loadExperimentSettingsButton">
-              <property name="text">
-               <string>Load Settings</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLineEdit" name="loadExperimentSettingsLineEdit"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadExperimentSettingsButton">
+            <property name="text">
+             <string>Load Settings</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="saveExperimentSettingsButton">
@@ -816,26 +809,112 @@ color: rgb(238, 238, 236);</string>
        <attribute name="title">
         <string>Conductivity</string>
        </attribute>
-       <widget class="QLabel" name="sourcemeterSettingsLabel">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>150</y>
-          <width>703</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(0, 0, 0);
-color: rgb(238, 238, 236);</string>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Source Meter&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="tissueThicknessVerticalLayout_2">
+            <item>
+             <widget class="QLineEdit" name="electrodeSpacingLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="electrodeSpacingUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="tissueThicknessLabel_2">
+            <property name="text">
+             <string>Electrode Spacing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <layout class="QVBoxLayout" name="crossSectionVerticalLayout_2">
+            <item>
+             <widget class="QLineEdit" name="conductivityCrossSectionLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="conductivityCrossSectionUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="crossSectionLabel_2">
+            <property name="text">
+             <string>Effective Cross-Sectional Area</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <layout class="QVBoxLayout" name="crossSectionVerticalLayout_3">
+            <item>
+             <widget class="QLineEdit" name="pbsConductivityLineEdit"/>
+            </item>
+            <item>
+             <widget class="QComboBox" name="conductivityUnitsComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="pbsConductivityLabel">
+            <property name="text">
+             <string>PBS Conductivity</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="targetResistanceLabel">
+            <property name="text">
+             <string>Target Resistance:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="adjustElectrodesPushButton">
+            <property name="text">
+             <string>Adjust Electrodes</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLineEdit" name="conductivityResultLineEdit"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="conductivitySaveLabel">
+            <property name="text">
+             <string>Conductivity Result Save Location</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLCDNumber" name="resistanceLCD"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="resisitanceLabel">
+            <property name="text">
+             <string>Resistance (Ohms)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="calculateConductivityPushButton">
+          <property name="text">
+           <string>Calculate Tissue Conductivity</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -852,6 +931,28 @@ color: rgb(238, 238, 236);</string>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
