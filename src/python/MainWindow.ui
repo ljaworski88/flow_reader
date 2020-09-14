@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -471,7 +471,7 @@ color: rgb(238, 238, 236);</string>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLineEdit" name="condutivityLineEdit"/>
+             <widget class="QLineEdit" name="conductivityLineEdit"/>
             </item>
             <item>
              <widget class="QLabel" name="conductivityLabel">
