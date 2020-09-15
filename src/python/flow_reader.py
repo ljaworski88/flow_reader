@@ -56,13 +56,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## Pi-end
 
         self.dataTimer = QtCore.QTimer(self)
-        self.timerInterval = 250 # update the graphs and data ever 250ms (aka 0.25s)
+        self.timerInterval = 1000 # update the graphs and data every 1000ms (aka 1s)
         self.lockTime = 5 * 60 # 5min * 60 sec
 
         self.currentlyRunning = False
         self.logData = False
 
-        self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) # store enough data for the lock in time
+        # store enough data for the lock in time
+        self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval)) 
         self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
         # self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
@@ -500,46 +501,104 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.pressurePredictionCurve.setData(displayPressures, predictedReadings)
 
     def RunStopData(self):
+        '''
+        Function used to start and stop the streaming potential calculator.
+        '''
+
         if self.currentlyRunning:
             self.currentlyRunning = False
             if self.logData:
                 self.StartStopLogging()
             self.dataTimer.stop()
             ## Pi-start
-            self.sourceMeter.close()
+            try:
+                self.sourceMeter.close()
+            except Exception as errorMessage:
+                print(errorMessage)
+                pass
             ## Pi-end
             self.runStopButton.setText('Run')
             self.runStatusLabel.setText('Stopped')
         else:
+
+            # Turn off all status LEDs and zero out all stored data. Also start the data collection timer
             gpio.output(self.doneLED, gpio.LOW)
-            self.dataTimer.start(self.timerInterval)
+            gpio.output(self.errorLED, gpio.LOW)
             self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.flowData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            # self.voltageData = deque([], int(self.lockTime * 1000 / self.timerInterval))
-            # self.currentData = deque([], int(self.lockTime * 1000 / self.timerInterval))
+            self.dataTimer.start(self.timerInterval)
             self.AdjustErrorBounds()
             self.currentlyRunning = True
-            if not self.transducer2SlopeLineEdit.text() or not self.transducer1SlopeLineEdit.text():
-                raise(ValueError('Both left and right transducers need calibration values'))
-            if not self.transducer2InterceptLineEdit.text() or not self.transducer1InterceptLineEdit.text():
-                raise(ValueError('Both left and right transducers need calibration values'))
 
-            ## Reset the pressure and flow chips on the I2C buses
+            # Make sure both transudcers have calibration values otherwise stop the run and prompt the user
+            try:
+                if not self.transducer2SlopeLineEdit.text() or not self.transducer1SlopeLineEdit.text():
+                    raise(ValueError('Both left and right transducers need calibration values'))
+                if not self.transducer2InterceptLineEdit.text() or not self.transducer1InterceptLineEdit.text():
+                    raise(ValueError('Both left and right transducers need calibration values'))
+            except Exception as errorMessage:
+                self.msg = QMessageBox()
+                self.msg.setWindowTitle('Error! Transducer Need Calibration Values')
+                self.msg.setText('Both transducers need calibration values, aborting run.\nProgram error message:\n{}'.format(str(errorMessage)))
+                self.msg.setIcon(QMessageBox.Error)
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.show()
+                self.RunStopData()
+
+            # Reset the pressure and flow chips on the I2C buses
 
             ## Pi-start
-            boot_cycle(self.i2c_bus)
-            boot_cycle(self.i2c_bus2)
-            reset_sensor(self.i2c_bus)
-            self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
+            # Starts all the NAU7802 pressure sensors, reports any errors in a message box
+            try:
+                boot_cycle(self.i2c_bus)
+                boot_cycle(self.i2c_bus2)
+            except Exception as errorMessage:
+                self.msg = QMessageBox()
+                self.msg.setWindowTitle('Error! NAU7802 Unreachable')
+                self.msg.setText('The NAU7802 were unreachable for some reason, aborting run.\nProgram error message:\n{}'.format(str(errorMessage)))
+                self.msg.setIcon(QMessageBox.Error)
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.show()
+                self.RunStopData()
+
+            # Starts the SLG-150 flow sensor, reports any errors in a message box
+            try:
+                reset_sensor(self.i2c_bus)
+            except Exception as errorMessage:
+                self.msg = QMessageBox()
+                self.msg.setWindowTitle('Error! SLG-150 Flow Meter Unreachable')
+                self.msg.setText('The SLG-150 flow sensor was unreachable for some reason, aborting run.\nProgram error message:\n{}'.format(str(errorMessage)))
+                self.msg.setIcon(QMessageBox.Error)
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.show()
+                self.RunStopData()
+
+            # check to see if the Keithley 6514 electrometer is connected to the raspberry pi
+            try:
+                self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
+                meterID = self.sourceMeter.query('*IDN?')
+                if 'KEITHLEY 6514' not in meterID:
+                    raise(ValueError('The wrong instrument is plugged in, ID of currently attached device is:\n{}'.format(meterID)))
+            except Exception as errorMessage:
+                self.msg = QMessageBox()
+                self.msg.setWindowTitle('Error! Keithley 6514 Electrometer Unreachable')
+                self.msg.setText('The Keithley 6514 electrometer was unreachable for some reason, aborting run.\nProgram error message:\n{}'.format(str(errorMessage)))
+                self.msg.setIcon(QMessageBox.Error)
+                self.msg.setStandardButtons(QMessageBox.Ok)
+                self.msg.show()
+                self.RunStopData()
+
+
+            # Configure the electrometer to measure voltage, not do the zero check, and take 20 consecutive readings
             self.sourceMeter.write('conf:volt:dc')
             self.sourceMeter.write('syst:zch 0')
-            sleep(0.5)
-            ## Pi-end
+            self.sourceMeter.write('arm:coun 20')
+
+            # Sleep for a quarter of a second to allow all the ICs to finish boot cycling
+            sleep(0.25)
 
             # Set up the pressure sensors
-
-            ## Pi-start
             set_avdd_voltage(self.i2c_bus, '4.5v')
             select_avdd_source(self.i2c_bus, internal_source=True)
             set_conversion_rate(self.i2c_bus, conversion_rate='sps10')
@@ -550,19 +609,15 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             set_conversion_rate(self.i2c_bus2, conversion_rate='sps10')
             set_gain(self.i2c_bus2, 'x16')
             start_reading_data(self.i2c_bus2, start=True)
-            ## Pi-end
 
             # Set up the flow sensor
-
-            ## Pi-start
             self.sensor, self.serialNumber, _, _ = read_product_info(self.i2c_bus)
             self.scaleFactor, self.units, _, _ = read_scale_and_unit(self.i2c_bus)
             set_resolution(self.i2c_bus, bits=self.resolutionSettingSpinBox.value())
             set_read_data(self.i2c_bus)
             ## Pi-end
 
-            # Set up the sourcemeter for voltage and current
-
+            # Set the status label on the Graphs Tab
             self.runStatusLabel.setText('Running')
             self.runStopButton.setText('Stop')
 
@@ -577,6 +632,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 with open(self.logFileLineEdit.text(), 'x') as fileHeader:
                     fileHeader.write('Time(Unix Epoch),Flow_Rate(L/s),Pressure(Pa)\n')
             except FileExistsError:
+                gpio.output(self.errorLED, gpio.HIGH)
                 self.msg = QMessageBox()
                 self.msg.setWindowTitle('File Exists!')
                 self.msg.setText('The file you are trying to write to already exists!\nInserting BREAK markers and appending new data')
@@ -585,6 +641,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 self.msg.show()
                 with open(self.logFileLineEdit.text(), 'a') as fileHeader:
                     fileHeader.write('BREAK,BREAK,BREAK,BREAK\n')
+                    gpio.output(self.errorLED, gpio.LOW)
 
 
     def PressureDifferential(self):
@@ -609,12 +666,12 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## Pi-start
         try:
             flowReading = self.ReadFlow()
-        except:
+        except Exception as errorMessage:
             flowReading = -1
 
         try:
             pressureDifferentialReading = self.PressureDifferential()
-        except:
+        except Exception as errorMessage:
             pressureDifferentialReading = -1
 
         # try:
@@ -639,8 +696,13 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressureData.append(pressureDifferentialReading)
         # self.voltageData.append(voltageReading)
         # self.currentData.append(currentReading)
+        # Make sure that the flow rate is within the error bounds of the setpoint (how close the flow sensor and syringe pump readings need to match)
         if self.lowerBound < self.flowData[-1] < self.upperBound and len(self.flowData) == self.flowData.maxlen:
+
+            # Make sure that the oldest 100 readings and the newest 100 readings are within a gap that is 4 times smaller than the error bound range
             if abs(mean(list(self.flowData)[:100]) - mean(list(self.flowData)[-100:])) < ((self.upperBound - self.lowerBound) / 4):
+
+                # Calculate the results of the experiment and inform the user that the experiment is done
                 self.CalculateResult()
                 if self.popUpDoneCheckBox.isChecked():
                     self.msg = QMessageBox()
@@ -799,7 +861,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.pressurePredictionCurve.setData(displayPressures, predictedReadings)
         self.pressureCalibrationGraphText.setText('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, self.r_sq))
         self.pressureCalibrationGraphText.setPos(0,0)
-        print('Slope: {}\nIntecept: {}\nR^2: {}'.format(slope, intercept, self.r_sq))
         if slope == float(0):
             self.readingToPressureSlope = 0.0
             self.readingToPressureIntercept = 0.0

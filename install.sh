@@ -1,15 +1,17 @@
 #!/bin/bash
 
-# Back-up the location of the starting directory
-STARTING_DIR=$PWD
+sudo apt update
+sudo apt upgrade -y
 
 # Turn on the two needed I2C buses
 sudo echo 'dtparam=i2c_arm=on' >> /boot/config.txt
 sudo echo 'dtoverlay=i2c-gpio,bus=3' >> /boot/config.txt
 
 # Install python dependencies
+sudo apt install python3-pip
 sudo apt install python3-pyvisa python3-pyvisa-py python3-numpy python3-sklearn
 sudo apt install python3-pyqt5 python3-yaml python3-serial python3-pyqtgraph
+pip3 install smbus2
 
 # Install the NAU7802 library
 cd ~
@@ -29,5 +31,4 @@ pip3 install .
 cd ~/Desktop
 ln -s home/pi/flow_reader/src/python/flow_reader.py
 
-# Return to the install directory
-cd $STARTING_DIR
+sudo shutdown -r now

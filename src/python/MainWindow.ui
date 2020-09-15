@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="mainTabStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="graphicsTab">
        <property name="toolTip">
@@ -823,7 +823,7 @@ color: rgb(238, 238, 236);</string>
            </layout>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="tissueThicknessLabel_2">
+           <widget class="QLabel" name="electrodeSpacingLabel">
             <property name="text">
              <string>Electrode Spacing</string>
             </property>
@@ -840,7 +840,7 @@ color: rgb(238, 238, 236);</string>
            </layout>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="crossSectionLabel_2">
+           <widget class="QLabel" name="crossSectionConductivityLabel">
             <property name="text">
              <string>Effective Cross-Sectional Area</string>
             </property>
