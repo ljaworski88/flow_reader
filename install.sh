@@ -8,7 +8,7 @@ sudo apt upgrade -y
 sudo apt install -y python3-pip
 sudo apt install -y python3-pyvisa python3-pyvisa-py python3-numpy python3-sklearn
 sudo apt install -y python3-pyqt5 python3-serial python3-pyqtgraph
-pip3 install smbus2
+pip3 install smbus2 pyyaml
 
 # Install the NAU7802 library
 cd ~
