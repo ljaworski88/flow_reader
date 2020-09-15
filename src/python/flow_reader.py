@@ -521,6 +521,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         else:
 
             # Turn off all status LEDs and zero out all stored data. Also start the data collection timer
+            self.currentlyRunning = True
             gpio.output(self.doneLED, gpio.LOW)
             gpio.output(self.errorLED, gpio.LOW)
             self.timeData = deque([], int(self.lockTime * 1000 / self.timerInterval))
@@ -528,7 +529,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             self.pressureData = deque([], int(self.lockTime * 1000 / self.timerInterval))
             self.dataTimer.start(self.timerInterval)
             self.AdjustErrorBounds()
-            self.currentlyRunning = True
 
             # Make sure both transudcers have calibration values otherwise stop the run and prompt the user
             try:
@@ -544,6 +544,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.show()
                 self.RunStopData()
+                return
 
             # Reset the pressure and flow chips on the I2C buses
 
@@ -560,6 +561,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.show()
                 self.RunStopData()
+                return
 
             # Starts the SLG-150 flow sensor, reports any errors in a message box
             try:
@@ -572,6 +574,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.show()
                 self.RunStopData()
+                return
 
             # check to see if the Keithley 6514 electrometer is connected to the raspberry pi
             try:
@@ -587,38 +590,39 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
                 self.msg.setStandardButtons(QMessageBox.Ok)
                 self.msg.show()
                 self.RunStopData()
+                return
 
 
-                # Configure the electrometer to measure voltage, not do the zero check, and take 20 consecutive readings
-                self.sourceMeter.write('conf:volt:dc')
-                self.sourceMeter.write('syst:zch 0')
-                self.sourceMeter.write('arm:coun 20')
+            # Configure the electrometer to measure voltage, not do the zero check, and take 20 consecutive readings
+            self.sourceMeter.write('conf:volt:dc')
+            self.sourceMeter.write('syst:zch 0')
+            self.sourceMeter.write('arm:coun 20')
 
-                # Sleep for a quarter of a second to allow all the ICs to finish boot cycling
-                sleep(0.25)
+            # Sleep for a quarter of a second to allow all the ICs to finish boot cycling
+            sleep(0.25)
 
-                # Set up the pressure sensors
-                set_avdd_voltage(self.i2c_bus, '4.5v')
-                select_avdd_source(self.i2c_bus, internal_source=True)
-                set_conversion_rate(self.i2c_bus, conversion_rate='sps10')
-                set_gain(self.i2c_bus, 'x16')
-                start_reading_data(self.i2c_bus, start=True)
-                set_avdd_voltage(self.i2c_bus2, '4.5v')
-                select_avdd_source(self.i2c_bus2, internal_source=True)
-                set_conversion_rate(self.i2c_bus2, conversion_rate='sps10')
-                set_gain(self.i2c_bus2, 'x16')
-                start_reading_data(self.i2c_bus2, start=True)
+            # Set up the pressure sensors
+            set_avdd_voltage(self.i2c_bus, '4.5v')
+            select_avdd_source(self.i2c_bus, internal_source=True)
+            set_conversion_rate(self.i2c_bus, conversion_rate='sps10')
+            set_gain(self.i2c_bus, 'x16')
+            start_reading_data(self.i2c_bus, start=True)
+            set_avdd_voltage(self.i2c_bus2, '4.5v')
+            select_avdd_source(self.i2c_bus2, internal_source=True)
+            set_conversion_rate(self.i2c_bus2, conversion_rate='sps10')
+            set_gain(self.i2c_bus2, 'x16')
+            start_reading_data(self.i2c_bus2, start=True)
 
-                # Set up the flow sensor
-                self.sensor, self.serialNumber, _, _ = read_product_info(self.i2c_bus)
-                self.scaleFactor, self.units, _, _ = read_scale_and_unit(self.i2c_bus)
-                set_resolution(self.i2c_bus, bits=self.resolutionSettingSpinBox.value())
-                set_read_data(self.i2c_bus)
-                ## Pi-end
+            # Set up the flow sensor
+            self.sensor, self.serialNumber, _, _ = read_product_info(self.i2c_bus)
+            self.scaleFactor, self.units, _, _ = read_scale_and_unit(self.i2c_bus)
+            set_resolution(self.i2c_bus, bits=self.resolutionSettingSpinBox.value())
+            set_read_data(self.i2c_bus)
+            ## Pi-end
 
-                # Set the status label on the Graphs Tab
-                self.runStatusLabel.setText('Running')
-                self.runStopButton.setText('Stop')
+            # Set the status label on the Graphs Tab
+            self.runStatusLabel.setText('Running')
+            self.runStopButton.setText('Stop')
 
     def StartStopLogging(self):
         if self.logData:
