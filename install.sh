@@ -3,9 +3,6 @@
 sudo apt update
 sudo apt upgrade -y
 
-# Turn on the two needed I2C buses
-exec sudo su -c "echo 'dtparam=i2c_arm=on' >> /boot/config.txt"
-exec sudo su -c "echo 'dtoverlay=i2c-gpio,bus=3' >> /boot/config.txt"
 
 # Install python dependencies
 sudo apt install -y python3-pip
@@ -31,4 +28,7 @@ pip3 install .
 cd ~/Desktop
 ln -s home/pi/flow_reader/src/python/flow_reader.py
 
+# Turn on the two needed I2C buses
+echo "dtparam=i2c_arm=on" | sudo tee -a /boot/config.txt
+echo "dtoverlay=i2c-gpio,bus=3" | sudo tee -a /boot/config.txt
 sudo shutdown -r now
