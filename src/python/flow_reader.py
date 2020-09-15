@@ -315,11 +315,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         else:
             fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.loadFlowReaderSettingsLineEdit.text()])
             if not path.isfile(fileName):
-                saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'YAML Files')[0]
-            else:
                 saveFileLocation = fileName
-            with open(saveFileLocation, 'w') as saveSensor:
-                yaml.dump(saveData, saveSensor)
+            try:
+                with open(saveFileLocation, 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
+            except:
+                saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'YAML Files')[0]
+                with open(saveFileLocation, 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
 
     def SaveExperimentSettings(self, fileName=None):
         saveData = {'Results Save' : self.saveResultsNameLineEdit.text(),
@@ -342,11 +345,14 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         else:
             fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.loadExperimentSettingsLineEdit.text()])
             if not path.isfile(fileName):
-                saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'YAML Files')[0]
-            else:
                 saveFileLocation = fileName
-            with open(saveFileLocation, 'w') as saveSensor:
-                yaml.dump(saveData, saveSensor)
+            try:
+                with open(saveFileLocation, 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
+            except:
+                saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'YAML Files')[0]
+                with open(saveFileLocation, 'w') as saveSensor:
+                    yaml.dump(saveData, saveSensor)
 
     def LoadCalibrationTransducer1(self):
         saveFileLocation = QFileDialog.getOpenFileName(self, 'Open File','/home/pi', 'Cal Files (*.cal)')
@@ -748,12 +754,16 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.saveResultsNameLineEdit])
         if not path.isfile(fileName):
-            saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
-        else:
             saveFileLocation = fileName
-        with open(saveFileLocation, 'x', newline='') as resultsCSV:
-            resultsCSV.write('Streaming Potential (V),Hydraulic Permeability (m^3*s/kg) - measured flow,Hydraulic Permeability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)\n')
-            resultsCSV.write('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermeabilityMeasured, self.hydraulicPermeabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
+        try:
+            with open(saveFileLocation, 'x', newline='') as resultsCSV:
+                resultsCSV.write('Streaming Potential (V),Hydraulic Permeability (m^3*s/kg) - measured flow,Hydraulic Permeability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)\n')
+                resultsCSV.write('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermeabilityMeasured, self.hydraulicPermeabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
+        except:
+            saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
+            with open(saveFileLocation, 'x', newline='') as resultsCSV:
+                resultsCSV.write('Streaming Potential (V),Hydraulic Permeability (m^3*s/kg) - measured flow,Hydraulic Permeability (m^3*s/kg) - predicted flow,Pressure Differential (Pa),Measured Flow (m^3/s),Predicted Flow (m^3/s)\n')
+                resultsCSV.write('{},{},{},{},{},{}'.format(self.streamingPotential, self.hydraulicPermeabilityMeasured, self.hydraulicPermeabilityPredicted, pressureDifferential, meanFlow, predictedFlow))
 
     def UpdateGraphs(self):
         if self.mainTabStack.currentIndex() == 0:
