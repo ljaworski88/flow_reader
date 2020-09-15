@@ -585,7 +585,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             try:
                 self.sourceMeter = self.visaResourceManager.open_resource('ASRL/dev/ttyUSB0::INSTR')
                 meterID = self.sourceMeter.query('*IDN?')
-                if 'KEITHLEY 6514' not in meterID:
+                if 'MODEL 6514' not in meterID:
                     raise(ValueError('The wrong instrument is plugged in, ID of currently attached device is:\n{}'.format(meterID)))
             except Exception as errorMessage:
                 self.msg = QMessageBox()

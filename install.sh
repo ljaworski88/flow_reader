@@ -4,8 +4,8 @@ sudo apt update
 sudo apt upgrade -y
 
 # Turn on the two needed I2C buses
-sudo echo 'dtparam=i2c_arm=on' >> /boot/config.txt
-sudo echo 'dtoverlay=i2c-gpio,bus=3' >> /boot/config.txt
+exec sudo su -c "echo 'dtparam=i2c_arm=on' >> /boot/config.txt"
+exec sudo su -c "echo 'dtoverlay=i2c-gpio,bus=3' >> /boot/config.txt"
 
 # Install python dependencies
 sudo apt install python3-pip
