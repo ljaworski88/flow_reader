@@ -23,8 +23,8 @@ pip3 install .
 cd ~
 git clone https://github.com/ljaworski88/sensirion-sf04-python.git
 cd sensirion-sf04-python
-sudo rm /boot/overlays/i2c-gpio.dtbo
-sudo cp i2c-gpio.dtbo /boot/overlays/i2c-gpio.dtbo
+#sudo rm /boot/overlays/i2c-gpio.dtbo
+#sudo cp i2c-gpio.dtbo /boot/overlays/i2c-gpio.dtbo
 pip3 install .
 
 # Place a symbolic link to the flow reader on the desktop
