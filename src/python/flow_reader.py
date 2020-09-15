@@ -313,7 +313,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if fileName == 0xDEADBEEF:
             return saveData
         else:
-            fileName = ''.join('/home/pi/StreamingPotentialResults/', self.loadFlowReaderSettingsLineEdit.text())
+            fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.loadFlowReaderSettingsLineEdit.text()])
             if not path.isfile(fileName):
                 saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'YAML Files')[0]
             else:
@@ -340,7 +340,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         if fileName == 0xDEADBEEF:
             return saveData
         else:
-            fileName = ''.join('/home/pi/StreamingPotentialResults/', self.loadExperimentSettingsLineEdit.text())
+            fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.loadExperimentSettingsLineEdit.text()])
             if not path.isfile(fileName):
                 saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'YAML Files')[0]
             else:
@@ -365,7 +365,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.transducer2SerialLineEdit.setText(str(sensorSettings['serial']))
 
     def LoadSensorSettings(self, fileName=None):
-        fileName = ''.join('/home/pi/StreamingPotentialResults/', self.loadFlowReaderSettingsLineEdit.text())
+        fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.loadFlowReaderSettingsLineEdit.text()])
         if not path.isfile(fileName):
             saveFileLocation = QFileDialog.getOpenFileName(self, 'Load Sensor Settings', '/home/pi', 'YAML Files (*.yaml, *.yml)')[0]
         else:
@@ -388,7 +388,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.transducer1UnitComboBox.setCurrentText(loadedSettings['Pressure Transducer']['Transducer1']['Units'])
 
     def LoadExperimentSettings(self, fileName=None):
-        fileName = ''.join('/home/pi/StreamingPotentialResults/', self.loadExperimentSettingsLineEdit.text())
+        fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.loadExperimentSettingsLineEdit.text()])
         if not path.isfile(fileName):
             saveFileLocation = QFileDialog.getOpenFileName(self, 'Load Experiment Settings', '/home/pi', 'YAML Files (*.yaml, *.yml)')[0]
         else:
@@ -746,7 +746,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermeability)
 
-        fileName = ''.join('/home/pi/StreamingPotentialResults/', self.saveResultsNameLineEdit)
+        fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.saveResultsNameLineEdit])
         if not path.isfile(fileName):
             saveFileLocation = QFileDialog.getSaveFileName(self, 'Save Results', '/home/pi', 'CSV Files')[0]
         else:
