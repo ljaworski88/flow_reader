@@ -8,9 +8,9 @@ exec sudo su -c "echo 'dtparam=i2c_arm=on' >> /boot/config.txt"
 exec sudo su -c "echo 'dtoverlay=i2c-gpio,bus=3' >> /boot/config.txt"
 
 # Install python dependencies
-sudo apt install python3-pip
-sudo apt install python3-pyvisa python3-pyvisa-py python3-numpy python3-sklearn
-sudo apt install python3-pyqt5 python3-yaml python3-serial python3-pyqtgraph
+sudo apt install -y python3-pip
+sudo apt install -y python3-pyvisa python3-pyvisa-py python3-numpy python3-sklearn
+sudo apt install -y python3-pyqt5 python3-serial python3-pyqtgraph
 pip3 install smbus2
 
 # Install the NAU7802 library
