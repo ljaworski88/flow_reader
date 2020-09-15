@@ -601,7 +601,6 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
             # Configure the electrometer to measure voltage, not do the zero check, and take 20 consecutive readings
             self.sourceMeter.write('conf:volt:dc')
             self.sourceMeter.write('syst:zch 0')
-            self.sourceMeter.write('arm:coun 20')
 
             # Sleep for a quarter of a second to allow all the ICs to finish boot cycling
             sleep(0.25)
