@@ -751,7 +751,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
 
         # self.fixedChargeDensity = -(self.streamingPotential * conductivity) / (faradayConstant * pressureDifferential * self.hydraulicPermeability)
 
-        fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.saveResultsNameLineEdit])
+        fileName = ''.join(['/home/pi/StreamingPotentialResults/', self.saveResultsNameLineEdit.text()])
         if not path.isfile(fileName):
             saveFileLocation = fileName
         try:
