@@ -6,7 +6,7 @@ import visa
 from time import sleep, time
 from collections import deque
 from statistics import mean
-from os import path
+from os import path, mkdir
 from subprocess import Popen
 import sys
 import yaml
@@ -33,7 +33,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.setWindowTitle('Streaming Potential Calculator')
         self.setWindowIcon(QtGui.QIcon('logo.png'))
         if not path.isdir('/home/pi/StreamingPotentialResults/'):
-            os.mkdir('/home/pi/StreamingPotentialResults/', mode=755)
+            mkdir('/home/pi/StreamingPotentialResults/', mode=755)
 
         ## Set the main page of the app
         self.mainTabStack.setCurrentIndex(0)
