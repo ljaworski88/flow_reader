@@ -33,7 +33,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         self.setWindowTitle('Streaming Potential Calculator')
         self.setWindowIcon(QtGui.QIcon('logo.png'))
         if not path.isdir('/home/pi/StreamingPotentialResults/'):
-            mkdir('/home/pi/StreamingPotentialResults/', mode=755)
+            mkdir('/home/pi/StreamingPotentialResults/')
 
         ## Set the main page of the app
         self.mainTabStack.setCurrentIndex(0)
