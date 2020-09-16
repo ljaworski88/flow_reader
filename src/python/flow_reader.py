@@ -655,8 +655,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         rawTransducer2Reading = read_load(self.i2c_bus)
         rawTransducer1Reading = read_load(self.i2c_bus2)
         transducer2Reading = float(self.transducer2SlopeLineEdit.text()) * rawTransducer2Reading + float(self.transducer2InterceptLineEdit.text())
-        # transducer1Reading = float(self.transducer1SlopeLineEdit.text()) * rawTransducer1Reading + float(self.transducer1InterceptLineEdit.text())
-        transducer1Reading = 0.0
+        transducer1Reading = float(self.transducer1SlopeLineEdit.text()) * rawTransducer1Reading + float(self.transducer1InterceptLineEdit.text())
         if self.transducer2RadioButton.isChecked():
             return transducer2Reading - transducer1Reading
         else:
