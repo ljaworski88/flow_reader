@@ -696,7 +696,7 @@ class StreamingPotentialApp(QMainWindow, Ui_MainWindow):
         ## not-Pi-end
         if self.logData:
             with open(self.logFileLineEdit.text(), 'a') as data:
-                data.write('{},{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading))
+                data.write('{},{},{}\n'.format(timepoint, flowReading, pressureDifferentialReading))
 
         self.flowData.append(flowReading)
         self.pressureData.append(pressureDifferentialReading)
